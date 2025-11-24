@@ -11,10 +11,37 @@
 #include <algorithm>
 #include <cstdlib> 
 
+#include "Problem.h"
+
 using namespace std;
 using namespace std::chrono;
 
+// void readInFile(ifstream &file, int &inputfile_y, int &inputfile_x, int &inputfile_weight, string &inputfile_name){
+
+//         //feed in the [] , {} into this char
+//         char discard_element;
+        
+
+//         //take in the [y,x],
+//         file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
+
+//         //take in the {weight}
+//         file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
+
+//         //take in the NAME (getline b/c it can have spaces)
+//         getline(file >> ws, inputfile_name);
+
+    
+// }
+
 int main(){
+
+    //2D array 
+
+    //lol i lied we can't have a 2D array of type object -> we shall make it a vector
+    //when populating the vector, we need to make sure its [8][12] strict
+    //Container ship[8][12];
+    vector<vector<Container>> initial_ship_state(8, vector<Container>(12));
 
     //Prompt user to Enter a Manifest
 
@@ -75,15 +102,82 @@ int main(){
     */
 
     //populate 2D array to reflect the file's content (96 cells, 8 x 12 object)
-    //convert elements to numeric ?? <- not sure if this will make it easier 
+    
+    //get each row from file to populate each Container object
+    string filerow;
+
+
+
+    //feed in the values for container object
+    int inputfile_y;
+    int inputfile_x;
+    int inputfile_weight;
+    string inputfile_name;
+
+    //get a validation check for 8 rows in here later !! -> ur welcome isabelle <3
+
+    //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
+
+    //cause the the y is lwk upside down, top row is row 8, and bottom row is 1
+    for(int i = 8; i > 0; i--){
+        //there should be 12 objects in every tempVec, then tempVect should get reset
+        //vector<Container> tempVec;
+        
+        for(int j = 0; j < 12; j++){
+
+            //validation check needed here !!
+            // function made to read in each line of the file
+            //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
+                    //feed in the [] , {} into this char
+            char discard_element;
+            
+
+            //take in the [y,x],
+            file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
+
+            //take in the {weight}
+            file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
+
+            //take in the NAME (getline b/c it can have spaces)
+            getline(file, inputfile_name);
+
+
+            //create container with given info
+            Container container_object(inputfile_y, inputfile_x, inputfile_weight, inputfile_name); 
+
+            if(inputfile_name == "UNUSED"){
+                container_object.free_spot = true;
+            }
+
+            //put the container object into a vector<vector<Container>> shipNode
+            //tempVec.push_back(container_object);
+            initial_ship_state[i][j] = container_object;
+        }
+        //append each tempVec to the 2D vector 
+        //initial_ship_state.push_back(tempVec);
+    }
+
+
 
 
     //close the file
     file.close();
 
+    /*
+    //output validation check for ship state (guys i kinda ate with the output stuff, logfile bout to look firee)
+    for (size_t i = 0; i < initial_ship_state.size(); ++i) { 
+        for (size_t j = 0; j < initial_ship_state[i].size(); ++j) { 
+            cout << initial_ship_state[i][j] << " "; 
+        }
+        cout << endl;
+    }
+    */
 
+    //turn the 2D vector object into a Ship Node, and start the algooo
+    ShipNode initial_node(initial_ship_state);
 
-
+    //THIS WORKKSS AHAHAHAHHAHAHAHHHA
+    //cout << initial_node;
 
     
     return 0; 
