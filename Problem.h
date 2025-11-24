@@ -101,15 +101,15 @@ struct ShipNode{
 };
 
 //output operator for testing purposes (until we get the GUI ready, this is just for commandline output visual)
-ostream &operator<<(ostream &output, const ShipNode &node){
-    for (int i = 0; i < node.default_ship_state.size(); ++i) { 
-        for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
-            output << node.default_ship_state[i][j] << "\n"; 
-        }
-        output << "\n";
-    }
-    return output;
-}
+// ostream &operator<<(ostream &output, const ShipNode &node){
+//     for (int i = 0; i < node.default_ship_state.size(); ++i) { 
+//         for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
+//             output << node.default_ship_state[i][j] << "\n"; 
+//         }
+//         output << "\n";
+//     }
+//     return output;
+// }
 
 class Problem
 {

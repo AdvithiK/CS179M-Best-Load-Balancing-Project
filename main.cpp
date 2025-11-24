@@ -119,7 +119,7 @@ int main(){
     //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
 
     //cause the the y is lwk upside down, top row is row 8, and bottom row is 1
-    for(int i = 8; i > 0; i--){
+    for(int i = 7; i >= 0; i--){
         //there should be 12 objects in every tempVec, then tempVect should get reset
         //vector<Container> tempVec;
         
@@ -137,7 +137,7 @@ int main(){
 
             //take in the {weight}
             file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
-
+            
             //take in the NAME (getline b/c it can have spaces)
             getline(file, inputfile_name);
 
