@@ -16,23 +16,6 @@
 using namespace std;
 using namespace std::chrono;
 
-// void readInFile(ifstream &file, int &inputfile_y, int &inputfile_x, int &inputfile_weight, string &inputfile_name){
-
-//         //feed in the [] , {} into this char
-//         char discard_element;
-        
-
-//         //take in the [y,x],
-//         file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
-
-//         //take in the {weight}
-//         file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
-
-//         //take in the NAME (getline b/c it can have spaces)
-//         getline(file >> ws, inputfile_name);
-
-    
-// }
 
 int main(){
 
@@ -42,6 +25,8 @@ int main(){
     //when populating the vector, we need to make sure its [8][12] strict
     //Container ship[8][12];
     vector<vector<Container>> initial_ship_state(8, vector<Container>(12));
+
+   //vector<vector<Container>> small_ship_state(2, vector<Container>(4));
 
     //Prompt user to Enter a Manifest
 
@@ -118,7 +103,7 @@ int main(){
 
     //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
 
-    //cause the the y is lwk upside down, top row is row 8, and bottom row is 1
+    //cause the the y is lwk upside down, top row is row 8 (index 7), and bottom row is 1 (index 0)
     for(int i = 7; i >= 0; i--){
         //there should be 12 objects in every tempVec, then tempVect should get reset
         //vector<Container> tempVec;
@@ -140,7 +125,6 @@ int main(){
             
             //take in the NAME (getline b/c it can have spaces)
             getline(file, inputfile_name);
-
 
             //create container with given info
             Container container_object(inputfile_y, inputfile_x, inputfile_weight, inputfile_name); 
@@ -175,9 +159,57 @@ int main(){
 
     //turn the 2D vector object into a Ship Node, and start the algooo
     ShipNode initial_node(initial_ship_state);
+    //ShipNode small_initial_node(small_ship_state);
+    Problem p(initial_node);
 
-    //THIS WORKKSS AHAHAHAHHAHAHAHHHA
+    //find all the containers in the initial ship
+    p.findContainers(initial_node);
+
+    //calculate all weights for the ship
+    p.calculateShipNode(initial_node);
+
+    // if(p.balanceCheck(initial_node)){
+    //     cout << "BALANCED";
+    // }
+    // else{
+    //     cout << "NOT BALANCED";
+    // }
+
+
+    /* ---------------------------------------- TESTINGGGG -------------------------------------------------*/
+
+    //cout << "ur a rat" << endl;
+
+    //output the node to terminal when needed: THIS WORKKSS AHAHAHAHHAHAHAHHHA
     //cout << initial_node;
+    //p.findContainers(initial_node);
+
+    //p.calculateShipNode(initial_node);
+    //p.printCalculations(initial_node);
+
+    /* ------------------------------------ END OF TESTINGGGG -----------------------------------------------*/
+
+
+
+
+    /* unlock when necessary: writing to output file */
+
+    // string output_file;
+    // cout << "Enter output file name: ";
+    // cin >> output_file;
+
+    // ofstream out(output_file);
+    // if (!out.is_open()) {
+    //     cout << "Could not open output file: " << output_file << endl;
+    //     return 1;
+    // }
+
+    
+    // out << initial_node; 
+
+    // out.close();
+
+
 
     
     return 0; 

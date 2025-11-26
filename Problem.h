@@ -46,10 +46,10 @@ struct Container{
     bool free_spot = false;
 
     //default Container object
-    Container() : name("UNUSED"), weight(0), initial_y(0), initial_x(0), final_y(0), final_x(0), free_spot(true) {}
+    Container() : name("UNUSED"), weight(0), initial_y(0), initial_x(0), final_y(0), final_x(0), free_spot(true) {};
     
     //Container constructor (to make all the containers from file read)
-    Container(int given_y, int given_x, int given_weight, string given_name) : name(given_name), weight(given_weight), initial_y(given_y), initial_x(given_x), final_y(given_y), final_x(given_x), free_spot(false){}
+    Container(int given_y, int given_x, int given_weight, string given_name) : name(given_name), weight(given_weight), initial_y(given_y), initial_x(given_x), final_y(given_y), final_x(given_x), free_spot(false){};
 
 
     //helping overload operators :) besties fr
@@ -64,59 +64,135 @@ struct Container{
         return out;
     }
 
+    //operators
+
+    bool operator==(const Container& rhs){
+        bool twinsies = true;
+        if (!(weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x)){
+            twinsies = false;
+        }
+        return twinsies;
+    }
+
+    bool operator!=(const Container& rhs){
+        bool twinsies = false;
+        if (weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x){
+            twinsies = true;
+        }
+        return twinsies;
+    }
+
 };
 
 
 struct ShipNode{
 
     //deafult object shape for each ShipNode
-    vector<vector<Container>> default_ship_state;
+    vector<vector<Container>> default_ship_state = vector<vector<Container>>(8, vector<Container>(12));
 
-    //overload operators for Node output, assignment, & comparisons to right hand side Nodes
+    // //stores a list of containers in the ship (pointers? im doing copies for time being)
+    // vector<Container> containers;
     
-    //less than operator for comparison
-    bool operator< (const ShipNode&rhs) const{
-        return default_ship_state < rhs.default_ship_state;
+    //highkey don't remember much on pointers. isabelleeeeee helpppp plzzzz
+    ShipNode* parent;
+
+    //total weight on the ship node
+    int sum_weight;
+
+    //total difference of p_side - s_side
+    int difference_weight;
+
+    //total weight on the port side
+    int p_side_weight;
+
+    //total weight on the sea side
+    int s_side_weight;
+
+    //cost (depth) of the ship node
+    int cost = 0;
+
+    //heuristic (how far node is from final solution)
+    //measured via distance from minimum viable balancing different
+    int heuristic;
+
+    //overload operators for ShipNode 
+
+    //less than operator for the priority queue to measure priority
+    bool operator< (const ShipNode& rhs) const{
+
+        return (cost+heuristic) > (rhs.cost + rhs.heuristic);
     }
 
-    //equal to operator for comparison
-    bool operator== (const ShipNode&rhs) const{
-        return default_ship_state == rhs.default_ship_state;
-    }
+    //assignment operator to make a copy of a ShipNode
+    ShipNode &operator=(const ShipNode& rhs){
+        
+        //copying all the containers from rhs to shipNode
+        for (int i = default_ship_state.size() - 1; i >= 0; i--) { 
+            for (int j = 0; j < default_ship_state[i].size(); j++) { 
 
-    //assignment operator for assignment
-    ShipNode &operator= (const ShipNode&rhs){
-        if(this != &rhs){
-            default_ship_state = rhs.default_ship_state;
+                default_ship_state[i][j] = rhs.default_ship_state[i][j];
+            }
+
         }
+        
+
+        //containers = rhs.containers;
+
+        sum_weight = rhs.sum_weight;
+        
+        p_side_weight = rhs.p_side_weight;
+
+        s_side_weight = rhs.s_side_weight;
+
+        cost = rhs.cost;
+
+        heuristic = rhs.heuristic;
+
+        //idk about this...
+        parent = rhs.parent;
+
         return *this;
+
+    }
+
+    //equals to comparison operator 
+    bool operator==(const ShipNode& rhs){
+        bool twinsies = true;
+        for (int i = default_ship_state.size() - 1; i >= 0; i--) { 
+            for (int j = 0; j < default_ship_state[i].size(); j++) { 
+                if(default_ship_state[i][j] != rhs.default_ship_state[i][j]){
+                    twinsies = false;
+                }
+            }
+
+        }
+        return twinsies;
     }
 
 
 
-    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node) {}
+    ShipNode(): parent(nullptr), sum_weight(0), difference_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0), default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
+    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node) {};
 
 
 
 };
 
 //output operator for testing purposes (until we get the GUI ready, this is just for commandline output visual)
-// ostream &operator<<(ostream &output, const ShipNode &node){
-//     for (int i = 0; i < node.default_ship_state.size(); ++i) { 
-//         for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
-//             output << node.default_ship_state[i][j] << "\n"; 
-//         }
-//         output << "\n";
-//     }
-//     return output;
-// }
+ostream &operator<<(ostream &output, const ShipNode &node);
 
 class Problem
 {
 public:
 
+    Problem();
+    Problem(ShipNode& node): initial_ship_state(node) {};
+
     ShipNode initial_ship_state;
     ShipNode final_ship_state;
+
+    //stores a list of containers in the ship (pointers? im doing copies for time being)
+    vector<Container> containers;
 
     //priority based on lowest cost states
     priority_queue<ShipNode> unexplored_ship_states;
@@ -126,7 +202,31 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
-    Problem(char manifest_ship_node[8][12]);
+    //finds all the containers in the ship & adds it to the containers list
+    void findContainers(ShipNode& node);
+
+    //search algo function 
+    void searchSolutionPath(ShipNode& node);
+
+    //calculates the heuristics, p side and s side etc...
+    void calculateShipNode(ShipNode& node);
+
+    //calls the ShipNode operations and creates new ship nodes to add to queue
+    void exploreShipNodes(ShipNode& node);
+
+    //repeatedly calls the container to be moved down until container is not floating
+    void moveShipNodeDown(ShipNode& node);
+
+    //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
+    void traceSolutionPath(ShipNode& node);
+
+    //checker to see if containers was populated
+    void printContainersList();
+
+    void printCalculations(ShipNode& node);
+
+    bool balanceCheck(ShipNode& node);
+
 
 
     //movements for different states of ShipNode
@@ -141,20 +241,6 @@ public:
     
     //right
     ShipNode right(const ShipNode &node);
-
-    //f(n) = g(n) + h(n)
-
-    //g(n) = depth = cost
-
-    //heuristic??
-
-
-    /*heuristic final check 
-    
-    number ! final_end_outcome: p.side,  s.side = (p.side,  s.side) - sumx0.10
-
-    
-    */
 
 
 
