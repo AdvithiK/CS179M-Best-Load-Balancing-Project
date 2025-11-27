@@ -88,19 +88,23 @@ struct Container{
 struct ShipNode{
 
     //deafult object shape for each ShipNode
-    vector<vector<Container>> default_ship_state = vector<vector<Container>>(8, vector<Container>(12));
+    //vector<vector<Container>> default_ship_state = vector<vector<Container>>(8, vector<Container>(12));
+
+    //TEST
+    vector<vector<Container>> default_ship_state = vector<vector<Container>>(3, vector<Container>(4));
+
 
     // //stores a list of containers in the ship (pointers? im doing copies for time being)
     // vector<Container> containers;
     
     //highkey don't remember much on pointers. isabelleeeeee helpppp plzzzz
-    ShipNode* parent;
+    //ShipNode* parent;
+
+    //hold the index of the parent
+    int parent;
 
     //total weight on the ship node
     int sum_weight;
-
-    //total difference of p_side - s_side
-    int difference_weight;
 
     //total weight on the port side
     int p_side_weight;
@@ -171,7 +175,9 @@ struct ShipNode{
 
 
 
-    ShipNode(): parent(nullptr), sum_weight(0), difference_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0), default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
+    //if we make parent a pointer, change it here 
+    //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(3, vector<Container>(4))) {};
     ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node) {};
 
 
@@ -203,44 +209,69 @@ public:
     stack<ShipNode> solution_path;
 
     //finds all the containers in the ship & adds it to the containers list
+    //DONE
     void findContainers(ShipNode& node);
 
     //search algo function 
     void searchSolutionPath(ShipNode& node);
 
+    ShipNode returnSolutionNode();
+
     //calculates the heuristics, p side and s side etc...
+    //DONE
     void calculateShipNode(ShipNode& node);
 
     //calls the ShipNode operations and creates new ship nodes to add to queue
     void exploreShipNodes(ShipNode& node);
 
-    //repeatedly calls the container to be moved down until container is not floating
-    void moveShipNodeDown(ShipNode& node);
+    //swaps the Container objects & updates final y & x for both Container objects
+    void swapContainers(ShipNode& node, int y1, int x1, int y2, int x2);
 
     //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
     void traceSolutionPath(ShipNode& node);
 
     //checker to see if containers was populated
+    //DONE
     void printContainersList();
 
+    //checker to see all calculations for a node
+    //DONE
     void printCalculations(ShipNode& node);
 
+    //checks the balance of the ship
+    //DONE
     bool balanceCheck(ShipNode& node);
 
+    //checks if a duplicate node exists
+    bool checkDuplicate(ShipNode& node);
+
+
+    //validation checks for movement operations
+    //check if there is a free spot above a container
+    bool checkUp(const ShipNode &node, const Container& box);
+
+    //check if there is a free spot left of a container
+    bool checkLeft(const ShipNode &node, const Container& box);
+    
+    //check if there is a free spot right of a container
+    bool checkRight(const ShipNode &node, const Container& box);
+
+    //check if there is a free spot below a container
+    bool checkDown(const ShipNode &node, const Container& box);
 
 
     //movements for different states of ShipNode
     //up
-    ShipNode up(const ShipNode &node);
+    ShipNode up(const ShipNode &node, const Container& box);
     
     //down
-    ShipNode down(const ShipNode &node);
+    ShipNode down(const ShipNode &node, const Container& box);
     
     //left
-    ShipNode left(const ShipNode &node);
+    ShipNode left(const ShipNode &node, const Container& box);
     
     //right
-    ShipNode right(const ShipNode &node);
+    ShipNode right(const ShipNode &node, const Container& box);
 
 
 
