@@ -49,11 +49,15 @@ void Problem::findContainers(ShipNode& node){
 
 };
 
-void Problem::printContainersList(){
+void Problem::printContainersList(ShipNode& node){
+
     for(int i = 0; i < containers.size(); i++){
         //testing for spacing
         //cout << "*" << containers.at(i).name << "\n";
-        cout << containers.at(i).name << "\n";
+        int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
+        int index_coord_x = containers.at(i).final_x-1;
+        cout << containers.at(i) << endl;
+        cout << "index: (" << index_coord_y << ", " << index_coord_x << ")" << endl;
     }
     //cout << containers.size();
 }
@@ -178,14 +182,14 @@ void Problem::exploreShipNodes(ShipNode& node){
         if(checkUp(node, containers.at(i))){
             cout << containers.at(i) << endl;
             ShipNode new_ship_node = up(node, containers.at(i));
-            if(!checkDuplicate(node)){
+            if(!checkDuplicate(new_ship_node)){
                 unexplored_ship_states.push(new_ship_node);
             }
 
             if(checkLeft(node, containers.at(i))){
      
                 ShipNode new_ship_node = left(node, containers.at(i));
-                if(!checkDuplicate(node)){
+                if(!checkDuplicate(new_ship_node)){
                     unexplored_ship_states.push(new_ship_node);
                 }
             }
@@ -193,7 +197,7 @@ void Problem::exploreShipNodes(ShipNode& node){
             if(checkRight(node, containers.at(i))){
               
                 ShipNode new_ship_node = right(node, containers.at(i));
-                if(!checkDuplicate(node)){
+                if(!checkDuplicate(new_ship_node)){
                     unexplored_ship_states.push(new_ship_node);
                 }
             }
@@ -202,7 +206,7 @@ void Problem::exploreShipNodes(ShipNode& node){
             while(checkDown(node, containers.at(i))){
          
                 ShipNode new_ship_node = down(node, containers.at(i));
-                if(!checkDuplicate(node)){
+                if(!checkDuplicate(new_ship_node)){
                     unexplored_ship_states.push(new_ship_node);
                 }
             }

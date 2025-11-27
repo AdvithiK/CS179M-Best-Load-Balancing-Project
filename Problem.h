@@ -6,6 +6,8 @@
 #include <stack>
 #include <cmath>
 #include <iomanip>
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -66,7 +68,7 @@ struct Container{
 
     //operators
 
-    bool operator==(const Container& rhs){
+    bool operator==(const Container& rhs) const{
         bool twinsies = true;
         if (!(weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x)){
             twinsies = false;
@@ -74,7 +76,7 @@ struct Container{
         return twinsies;
     }
 
-    bool operator!=(const Container& rhs){
+    bool operator!=(const Container& rhs) const{
         bool twinsies = false;
         if (weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x){
             twinsies = true;
@@ -177,8 +179,8 @@ struct ShipNode{
 
     //if we make parent a pointer, change it here 
     //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
-    ShipNode(): default_ship_state(vector<vector<Container>>(3, vector<Container>(4))) {};
-    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(3, vector<Container>(4))), parent(-1), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(-1), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
 
 
 
@@ -232,7 +234,7 @@ public:
 
     //checker to see if containers was populated
     //DONE
-    void printContainersList();
+    void printContainersList(ShipNode& node);
 
     //checker to see all calculations for a node
     //DONE

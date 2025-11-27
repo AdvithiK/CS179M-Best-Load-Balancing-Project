@@ -176,22 +176,25 @@ int main(){
     //find all the containers in the initial ship
     p.findContainers(initial_node);
 
+    //p.printContainersList(initial_node);
     //calculate all weights for the ship
     p.calculateShipNode(initial_node);
 
-    ShipNode result;
-    if(p.balanceCheck(initial_node)){
-        result = initial_node;
-    }
-    else{
-        cout << "Search for Solution..." << endl;
-        p.searchSolutionPath(initial_node);
-        result = p.returnSolutionNode();
-    }
+    // ShipNode result;
+    // if(p.balanceCheck(initial_node)){
+    //     result = initial_node;
+    // }
+    // else{
+    //     cout << "Search for Solution..." << endl;
+    //     p.searchSolutionPath(initial_node);
+    //     result = p.returnSolutionNode();
+    // }
 
-    cout << "Solution Found! Solution is written to output.txt" << endl;
-    //p.printCalculations(initial_node);
-    p.printCalculations(result);
+    // cout << "Solution Found! Solution is written to output.txt" << endl;
+
+    // p.printCalculations(result);
+
+    p.printCalculations(initial_node);
 
 
     // if(p.balanceCheck(initial_node)){
@@ -230,7 +233,8 @@ int main(){
     }
 
     
-    out << result; 
+    //out << result; 
+    out << initial_node;
 
     out.close();
 
