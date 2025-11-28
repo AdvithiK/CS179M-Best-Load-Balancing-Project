@@ -457,17 +457,22 @@ ShipNode Problem::right(const ShipNode &node, Container& box){
     //reset cost, parent, heurisitic?? -> call calculateShipNode
     //return the temp
 
+
     ShipNode new_ship_node = node;
+
     //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
     //find the index coordinate for y and x
     int index_coord_y = (node.default_ship_state.size() - box.final_y );
     int index_coord_x = box.final_x-1;
+
     
     //swap the containers (this function updates their final y and final x too, dw queen)
-    swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y-1, index_coord_x);
+    swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y, index_coord_x+1);
+
     
     //update final x for container
     box.final_x += 1;
+
 
     //finds & updates final y and final x for all containers
     findContainers(node);

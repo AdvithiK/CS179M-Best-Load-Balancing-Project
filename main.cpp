@@ -190,14 +190,14 @@ int main(){
     //cout << "------------------------------------" << endl;
    //p.printContainersList(result);
 
-    if(p.balanceCheck(initial_node)){
-        result = initial_node;
-    }
-    else{
-        cout << "Search for Solution..." << endl;
-        p.searchSolutionPath(initial_node);
-        result = p.returnSolutionNode();
-    }
+    // if(p.balanceCheck(initial_node)){
+    //     result = initial_node;
+    // }
+    // else{
+    //     cout << "Search for Solution..." << endl;
+    //     p.searchSolutionPath(initial_node);
+    //     result = p.returnSolutionNode();
+    // }
 
     //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
 
@@ -209,19 +209,43 @@ int main(){
     // //result = p.up(initial_node, initial_node.default_ship_state[1][0]);
     // //p.swapContainers(result, 0, 0, 1, 0);
 
+    /* TESTING THE MOVEMENT OPERATIONS */
+
     // cout << "---------------inital node---------------------" << endl;
-    // //p.printContainersList(result);
-    // cout << initial_node.default_ship_state[0][0] << endl;
-    // cout << initial_node.default_ship_state[1][0];
-    // cout << endl;
+    // // //p.printContainersList(result);
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
 
     // result = p.up(initial_node, initial_node.default_ship_state[1][0]);
 
-    // cout << "-----------------result node-------------------" << endl;
-    cout << "Solution Found! Solution is written to output.txt" << endl;
-    // cout << result.default_ship_state[0][0]<< endl;
-    // cout << result.default_ship_state[1][0];
-    p.printCalculations(result);
+    // cout << "-----------------result node: up-------------------" << endl;
+    
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+    // result = p.down(result, result.default_ship_state[0][0]);
+
+    // cout << "-----------------result node: down-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+    // result = p.right(result, result.default_ship_state[1][0]);
+
+    // cout << "-----------------result node: right-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+
+    // result = p.left(result, result.default_ship_state[1][1]);
+
+    // cout << "-----------------result node: right-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+    
+    /* END OF TESTING THE MOVEMENT OPERATIONS */
+    
+    //cout << "Solution Found! Solution is written to output.txt" << endl;
+    //p.printCalculations(result);
 
 
 
