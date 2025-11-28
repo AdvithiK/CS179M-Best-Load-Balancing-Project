@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -59,7 +60,7 @@ struct Container{
         //saving the format of the current output 
         ios oldState(nullptr);
         oldState.copyfmt(out);
-        out << "[" << setw(2) << setfill('0') << box.initial_y << "," << setw(2) << setfill('0') << box.initial_x << "]" << ", " 
+        out << "[" << setw(2) << setfill('0') << box.final_y << "," << setw(2) << setfill('0') << box.final_x << "]" << ", " 
         << "{" << setw(5) << setfill('0') << box.weight << "}" << ", " << box.name;
         //restoring the format of the current output 
         out.copyfmt(oldState);
@@ -70,7 +71,7 @@ struct Container{
 
     bool operator==(const Container& rhs) const{
         bool twinsies = true;
-        if (!(weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x)){
+        if (!(weight == rhs.weight && final_y == rhs.final_y && final_x == rhs.final_x)){
             twinsies = false;
         }
         return twinsies;
@@ -78,7 +79,7 @@ struct Container{
 
     bool operator!=(const Container& rhs) const{
         bool twinsies = false;
-        if (weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x){
+        if (weight == rhs.weight && final_y == rhs.final_y && final_x == rhs.final_x){
             twinsies = true;
         }
         return twinsies;
@@ -210,9 +211,13 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
+
     //finds all the containers in the ship & adds it to the containers list
     //DONE
-    void findContainers(ShipNode& node);
+    void findContainers(const ShipNode& node);
+
+    //finds all the unused containers, sets their free spots to true
+    void updatefreeSpots(ShipNode& node);
 
     //search algo function 
     void searchSolutionPath(ShipNode& node);
@@ -227,7 +232,7 @@ public:
     void exploreShipNodes(ShipNode& node);
 
     //swaps the Container objects & updates final y & x for both Container objects
-    void swapContainers(ShipNode& node, int y1, int x1, int y2, int x2);
+    void swapContainers(ShipNode& node, int prev_y, int prev_x, int new_y, int new_x);
 
     //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
     void traceSolutionPath(ShipNode& node);
@@ -264,16 +269,16 @@ public:
 
     //movements for different states of ShipNode
     //up
-    ShipNode up(const ShipNode &node, const Container& box);
+    ShipNode up(const ShipNode &node, Container& box);
     
     //down
-    ShipNode down(const ShipNode &node, const Container& box);
+    ShipNode down(const ShipNode &node,Container& box);
     
     //left
-    ShipNode left(const ShipNode &node, const Container& box);
+    ShipNode left(const ShipNode &node, Container& box);
     
     //right
-    ShipNode right(const ShipNode &node, const Container& box);
+    ShipNode right(const ShipNode &node, Container& box);
 
 
 

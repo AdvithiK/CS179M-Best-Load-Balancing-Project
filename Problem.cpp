@@ -7,7 +7,7 @@ using namespace std;
 
 ostream &operator<<(ostream &output, const ShipNode &node){
     //i starts backwards can row 1 is at the bottom of the node and row 8 is at the top
-    for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
+    for (int i = node.default_ship_state.size() - 1; i > 0; i--) { 
         for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
             output << node.default_ship_state[i][j] << "\n"; 
         }
@@ -24,10 +24,23 @@ string trim(const string& s) {
     return s.substr(start, end - start + 1);
 }
 
+void Problem::updatefreeSpots(ShipNode& node){
+    for (int i = node.default_ship_state.size() - 1; i >= 0; --i) { 
+        for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
+            string name = trim(node.default_ship_state[i][j].name);
+            if(name == "UNUSED"){
+                node.default_ship_state[i][j].free_spot = true;
+            }
+        }
+    }
+}
 
-void Problem::findContainers(ShipNode& node){
+
+void Problem::findContainers(const ShipNode& node){
     //loop thru the 2D array and find all Containers, append them to the list (copy for now, prob can be done with pointers)
     
+    //clear the containers list to restore/update the final y & final x for all containers
+    containers.clear();
 
     for (int i = node.default_ship_state.size() - 1; i >= 0; --i) { 
         for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
@@ -36,12 +49,9 @@ void Problem::findContainers(ShipNode& node){
             //     Container temp_container = node.default_ship_state[i][j];
             //     containers.push_back(temp_container);
             // }
-            if (name != "UNUSED" && name != "NAN" && name != "AIR"){
+            if (name != "UNUSED" && name != "NAN"){
                 Container temp_container = node.default_ship_state[i][j];
                 containers.push_back(temp_container);
-            }
-            else if(name == "UNUSED" || name == "AIR"){
-                node.default_ship_state[i][j].free_spot = true;
             }
         }
 
@@ -88,9 +98,9 @@ void Problem::searchSolutionPath(ShipNode& node){
         unexplored_ship_states.pop();
         explored_ship_states.push_back(curr_node);
         
-        solutionCheck = balanceCheck(curr_node);
-        if(solutionCheck){
+        if(balanceCheck(curr_node)){
             cout << "*BAGELRAT*" << endl;
+            solutionCheck = true;
             solution_node = curr_node;
         }
         else{
@@ -219,16 +229,24 @@ void Problem::exploreShipNodes(ShipNode& node){
 //swap the containers in the node
 //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
 //all swaps deal with index only, this function changes the final_y & final_x manually 
-void Problem::swapContainers(ShipNode& node, int y1, int x1, int y2, int x2){
-    int first_y = node.default_ship_state[y1][x1].final_y;
-    int first_x = node.default_ship_state[y1][x1].final_x;
-    
-    swap(node.default_ship_state[y1][x1], node.default_ship_state[y2][x2]);
-    node.default_ship_state[y1][x1].final_y = node.default_ship_state[y2][x2].final_y;
-    node.default_ship_state[y1][x1].final_x = node.default_ship_state[y2][x2].final_x;
+void Problem::swapContainers(ShipNode& node, int prev_y, int prev_x, int new_y, int new_x){
 
-    node.default_ship_state[y2][x2].final_y = first_y;
-    node.default_ship_state[y2][x2].final_x = first_x;
+    int temp_y = node.default_ship_state[new_y][new_x].final_y;
+    int temp_x = node.default_ship_state[new_y][new_x].final_x;
+    //cout << "(" << node.default_ship_state[new_y][new_x].final_y <<","<< node.default_ship_state[new_y][new_x].final_x << ")" <<endl;
+    
+    swap(node.default_ship_state[prev_y][prev_x], node.default_ship_state[new_y][new_x]);
+
+    //cout << "(" << node.default_ship_state[new_y][new_x].final_y <<","<< node.default_ship_state[new_y][new_x].final_x << ")" <<endl;
+    
+    //restore the final y & final x at coords
+    node.default_ship_state[prev_y][prev_x].final_y = node.default_ship_state[new_y][new_x].final_y;
+    node.default_ship_state[prev_y][prev_x].final_x = node.default_ship_state[new_y][new_x].final_x;
+
+    node.default_ship_state[new_y][new_x].final_y = temp_y;
+    node.default_ship_state[new_y][new_x].final_x = temp_x;
+
+    //cout << "(" << node.default_ship_state[new_y][new_x].final_y <<","<< node.default_ship_state[new_y][new_x].final_x << ")" <<endl;
 
 };
 
@@ -316,11 +334,12 @@ bool Problem::checkDown(const ShipNode &node, const Container& box){
 
 //movements for different states of ShipNode
 //up
-ShipNode Problem::up(const ShipNode &node, const Container& box){
+ShipNode Problem::up(const ShipNode &node, Container& box){
     //temp Shipnode = node
     //swap the container above it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
     //return the temp
+
     ShipNode new_ship_node = node;
     //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
     //find the index coordinate for y and x
@@ -329,6 +348,13 @@ ShipNode Problem::up(const ShipNode &node, const Container& box){
     
     //swap the containers (this function updates their final y and final x too, dw queen)
     swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y-1, index_coord_x);
+
+    //update final y for container
+    box.final_y += 1;
+
+    //finds & updates final y and final x for all containers
+    findContainers(node);
+
     //increate the cost bc we MADE A MOVEEE (i only make a move in code, never to a crush </3 <- heartbreak emoji)
     new_ship_node.cost += 1;
 
@@ -349,7 +375,7 @@ ShipNode Problem::up(const ShipNode &node, const Container& box){
 };
 
 //down
-ShipNode Problem::down(const ShipNode &node, const Container& box){
+ShipNode Problem::down(const ShipNode &node, Container& box){
     //temp Shipnode = node
     //swap the container below it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
@@ -365,6 +391,12 @@ ShipNode Problem::down(const ShipNode &node, const Container& box){
     //swap the containers (this function updates their final y and final x too, dw queen)
     swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y+1, index_coord_x);
     
+    //update final y for container
+    box.final_y -= 1;
+
+    //finds & updates final y and final x for all containers
+    findContainers(node);
+
     //increate the cost 
     new_ship_node.cost += 1;
 
@@ -382,7 +414,7 @@ ShipNode Problem::down(const ShipNode &node, const Container& box){
 };
 
 //left
-ShipNode Problem::left(const ShipNode &node, const Container& box){
+ShipNode Problem::left(const ShipNode &node, Container& box){
     //temp Shipnode = node
     //swap the container to the left of it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
@@ -396,6 +428,12 @@ ShipNode Problem::left(const ShipNode &node, const Container& box){
     
     //swap the containers (this function updates their final y and final x too, dw queen)
     swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y, index_coord_x-1);
+    
+    //update final x for container
+    box.final_x -= 1;
+
+    //finds & updates final y and final x for all containers
+    findContainers(node);
     
     //increate the cost 
     new_ship_node.cost += 1;
@@ -413,7 +451,7 @@ ShipNode Problem::left(const ShipNode &node, const Container& box){
 };
 
 //right
-ShipNode Problem::right(const ShipNode &node, const Container& box){
+ShipNode Problem::right(const ShipNode &node, Container& box){
     //temp Shipnode = node
     //swap the container to the right of it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
@@ -426,7 +464,13 @@ ShipNode Problem::right(const ShipNode &node, const Container& box){
     int index_coord_x = box.final_x-1;
     
     //swap the containers (this function updates their final y and final x too, dw queen)
-    swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y, index_coord_x+1);
+    swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y-1, index_coord_x);
+    
+    //update final x for container
+    box.final_x += 1;
+
+    //finds & updates final y and final x for all containers
+    findContainers(node);
     
     //increate the cost 
     new_ship_node.cost += 1;

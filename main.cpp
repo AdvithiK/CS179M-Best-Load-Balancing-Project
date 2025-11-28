@@ -122,7 +122,7 @@ int main(){
         for(int j = 0; j < 4; j++){
 
             if(i==0){
-                Container unused_object(0, j+1, 0, "AIR"); 
+                Container unused_object(initial_ship_state.size(), j+1, 0, "UNUSED"); 
 
                 initial_ship_state[i][j] = unused_object;
             }
@@ -176,25 +176,53 @@ int main(){
     //find all the containers in the initial ship
     p.findContainers(initial_node);
 
+    //updates the unused containers free spots
+    p.updatefreeSpots(initial_node);
+
     //p.printContainersList(initial_node);
     //calculate all weights for the ship
-    p.calculateShipNode(initial_node);
+    //p.calculateShipNode(initial_node);
 
-    // ShipNode result;
-    // if(p.balanceCheck(initial_node)){
-    //     result = initial_node;
-    // }
-    // else{
-    //     cout << "Search for Solution..." << endl;
-    //     p.searchSolutionPath(initial_node);
-    //     result = p.returnSolutionNode();
-    // }
+    //p.printCalculations(initial_node);
 
-    // cout << "Solution Found! Solution is written to output.txt" << endl;
+    ShipNode result = initial_node;
 
-    // p.printCalculations(result);
+    //cout << "------------------------------------" << endl;
+   //p.printContainersList(result);
 
-    p.printCalculations(initial_node);
+    if(p.balanceCheck(initial_node)){
+        result = initial_node;
+    }
+    else{
+        cout << "Search for Solution..." << endl;
+        p.searchSolutionPath(initial_node);
+        result = p.returnSolutionNode();
+    }
+
+    //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
+
+    //p.swapContainers(result, 2, 0, 1, 0);
+    //p.findContainers(result);
+    // cout << "------------------------------------" << endl;
+    // //p.printContainersList(result);
+
+    // //result = p.up(initial_node, initial_node.default_ship_state[1][0]);
+    // //p.swapContainers(result, 0, 0, 1, 0);
+
+    // cout << "---------------inital node---------------------" << endl;
+    // //p.printContainersList(result);
+    // cout << initial_node.default_ship_state[0][0] << endl;
+    // cout << initial_node.default_ship_state[1][0];
+    // cout << endl;
+
+    // result = p.up(initial_node, initial_node.default_ship_state[1][0]);
+
+    // cout << "-----------------result node-------------------" << endl;
+    cout << "Solution Found! Solution is written to output.txt" << endl;
+    // cout << result.default_ship_state[0][0]<< endl;
+    // cout << result.default_ship_state[1][0];
+    p.printCalculations(result);
+
 
 
     // if(p.balanceCheck(initial_node)){
@@ -233,8 +261,8 @@ int main(){
     }
 
     
-    //out << result; 
-    out << initial_node;
+    out << result; 
+    //out << initial_node;
 
     out.close();
 
