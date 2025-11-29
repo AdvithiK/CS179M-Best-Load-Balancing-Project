@@ -87,13 +87,14 @@ void Problem::searchSolutionPath(ShipNode& node){
 
     bool solutionCheck = false;
 
-    ShipNode curr_node = node;
-    ShipNode solution_node = curr_node;
+    ShipNode curr_node;
+    ShipNode solution_node;
 
     unexplored_ship_states.push(node);
     //cout << "*" << unexplored_ship_states.size() << "*" << endl;
 
     while(!unexplored_ship_states.empty() && !solutionCheck){
+        cout << "!*"<< unexplored_ship_states.top() << "*!" << endl;
         curr_node = unexplored_ship_states.top();
         unexplored_ship_states.pop();
         explored_ship_states.push_back(curr_node);
@@ -109,6 +110,7 @@ void Problem::searchSolutionPath(ShipNode& node){
         }
     }
     final_ship_state = solution_node;
+    cout << final_ship_state;
 
 };
 
@@ -193,6 +195,7 @@ void Problem::exploreShipNodes(ShipNode& node){
             cout << containers.at(i) << endl;
             ShipNode new_ship_node = up(node, containers.at(i));
             if(!checkDuplicate(new_ship_node)){
+                cout << "BIRD_U" <<endl;
                 unexplored_ship_states.push(new_ship_node);
             }
 
@@ -200,6 +203,7 @@ void Problem::exploreShipNodes(ShipNode& node){
      
                 ShipNode new_ship_node = left(node, containers.at(i));
                 if(!checkDuplicate(new_ship_node)){
+                    cout << "BIRD_L" <<endl;
                     unexplored_ship_states.push(new_ship_node);
                 }
             }
@@ -208,15 +212,18 @@ void Problem::exploreShipNodes(ShipNode& node){
               
                 ShipNode new_ship_node = right(node, containers.at(i));
                 if(!checkDuplicate(new_ship_node)){
+                    cout << "BIRD_R" <<endl;
                     unexplored_ship_states.push(new_ship_node);
                 }
             }
 
             //keep moving the container down until it is placed on the ship floor, container, or NAN
-            while(checkDown(node, containers.at(i))){
-         
+            //while(checkDown(node, containers.at(i))){
+            if(checkDown(node, containers.at(i))){
+                //cout << checkDown(node, containers.at(i)) << endl;
                 ShipNode new_ship_node = down(node, containers.at(i));
                 if(!checkDuplicate(new_ship_node)){
+                    //cout << "BIRD_D" <<endl;
                     unexplored_ship_states.push(new_ship_node);
                 }
             }
@@ -320,6 +327,7 @@ bool Problem::checkDown(const ShipNode &node, const Container& box){
     int index_coord_y = (node.default_ship_state.size() - box.final_y );
     int index_coord_x = box.final_x-1;
     bool availability = false;
+    cout << "(" << index_coord_y <<","<< index_coord_x << ")" <<endl;
 
     //if index_coord_y < 7
     if(index_coord_y < node.default_ship_state.size()-1){

@@ -213,7 +213,6 @@ public:
 
 
     //finds all the containers in the ship & adds it to the containers list
-    //DONE
     void findContainers(const ShipNode& node);
 
     //finds all the unused containers, sets their free spots to true
@@ -225,7 +224,6 @@ public:
     ShipNode returnSolutionNode();
 
     //calculates the heuristics, p side and s side etc...
-    //DONE
     void calculateShipNode(ShipNode& node);
 
     //calls the ShipNode operations and creates new ship nodes to add to queue
@@ -251,7 +249,6 @@ public:
 
     //checks if a duplicate node exists
     bool checkDuplicate(ShipNode& node);
-
 
     //validation checks for movement operations
     //check if there is a free spot above a container

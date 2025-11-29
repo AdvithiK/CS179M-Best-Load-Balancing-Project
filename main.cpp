@@ -181,23 +181,23 @@ int main(){
 
     //p.printContainersList(initial_node);
     //calculate all weights for the ship
-    //p.calculateShipNode(initial_node);
+    p.calculateShipNode(initial_node);
 
-    //p.printCalculations(initial_node);
+    p.printCalculations(initial_node);
 
     ShipNode result = initial_node;
 
     //cout << "------------------------------------" << endl;
    //p.printContainersList(result);
 
-    // if(p.balanceCheck(initial_node)){
-    //     result = initial_node;
-    // }
-    // else{
-    //     cout << "Search for Solution..." << endl;
-    //     p.searchSolutionPath(initial_node);
-    //     result = p.returnSolutionNode();
-    // }
+    if(p.balanceCheck(initial_node)){
+        result = initial_node;
+    }
+    else{
+        cout << "Search for Solution..." << endl;
+        p.searchSolutionPath(initial_node);
+        result = p.returnSolutionNode();
+    }
 
     //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
 
@@ -205,6 +205,7 @@ int main(){
     //p.findContainers(result);
     // cout << "------------------------------------" << endl;
     // //p.printContainersList(result);
+
 
     // //result = p.up(initial_node, initial_node.default_ship_state[1][0]);
     // //p.swapContainers(result, 0, 0, 1, 0);
@@ -244,8 +245,8 @@ int main(){
     
     /* END OF TESTING THE MOVEMENT OPERATIONS */
     
-    //cout << "Solution Found! Solution is written to output.txt" << endl;
-    //p.printCalculations(result);
+    cout << "Solution Found! Solution is written to output.txt" << endl;
+    p.printCalculations(result);
 
 
 
