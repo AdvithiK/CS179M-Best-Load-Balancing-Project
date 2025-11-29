@@ -1,0 +1,26 @@
+body {
+  overflow: hidden; 
+}
+
+h1 {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 25px;
+  letter-spacing: 1px;
+  margin-left: 20px;
+}
+
+.program-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;     
+    height: 100vh;
+    gap: 5px;
+}
+
+#ShipBox {
+
+    border: 2px solid black;
+    height: auto;     
+    display: block;
+}
