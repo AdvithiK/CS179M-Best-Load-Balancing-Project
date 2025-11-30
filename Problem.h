@@ -212,6 +212,7 @@ public:
     stack<ShipNode> solution_path;
 
 
+    void queueNonFloatingStates( Container& box);
     //finds all the containers in the ship & adds it to the containers list
     void findContainers(const ShipNode& node);
 
@@ -230,7 +231,7 @@ public:
     void calculateShipNode(ShipNode& node);
 
     //calls the ShipNode operations and creates new ship nodes to add to queue
-    void exploreShipNodes(ShipNode& node);
+    void exploreShipNodes(ShipNode& node, Container& box);
 
     //swaps the Container objects & updates final y & x for both Container objects
     void swapContainers(ShipNode& node, int prev_y, int prev_x, int new_y, int new_x);

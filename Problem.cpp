@@ -118,42 +118,61 @@ void Problem::printContainersList(ShipNode& node){
 }
 
 
+void Problem::queueNonFloatingStates(Container& box){
+    for(int i = 0; i < explored_ship_states.size(); i++){
+        if(!checkDown(explored_ship_states.at(i), box)){
+            unexplored_ship_states.push(explored_ship_states.at(i));
+        }
+    }
+}
+
 
 //search algo function, a* algo
 void Problem::searchSolutionPath(ShipNode& node){
-    // cout << "*RAT*" << endl;
-    //push initial ShipNode to priority queue
-    //make temp ShipNode
-
-    //while the queue is not empty or a solution is found
-    //temp Shipnode = top of priority queue + pop it off 
-    //check if shipnode is in a valid state
-    //else explore the node (add this to the priority queue)
 
     bool solutionCheck = false;
 
-    ShipNode curr_node;
+    ShipNode curr_node = node;
     ShipNode solution_node;
 
     unexplored_ship_states.push(node);
     //cout << "*" << unexplored_ship_states.size() << "*" << endl;
 
-    while(!unexplored_ship_states.empty() && !solutionCheck){
-        cout << "!*"<< unexplored_ship_states.top() << "*!" << endl;
-        curr_node = unexplored_ship_states.top();
-        unexplored_ship_states.pop();
-        explored_ship_states.push_back(curr_node);
+    for(int i = 0; i < containers.size(); i++){
+        int index_coord_y = get_y_coord(node, containers.at(i));
+        int index_coord_x = get_x_coord(node, containers.at(i));
+        cout << "Initial Indexes:" << index_coord_y << "," << index_coord_x << "\n";
+        if(checkUp(curr_node, containers.at(i))){
+            while(!unexplored_ship_states.empty()){
+                cout << "!*\n\n"<< unexplored_ship_states.top() << "*!" << endl;
+                curr_node = unexplored_ship_states.top();
+                unexplored_ship_states.pop();
+                explored_ship_states.push_back(curr_node);
+                
+                if(balanceCheck(curr_node)){
+                    cout << "*BAGELRAT*" << endl;
+                    solutionCheck = true;
+                    solution_node = curr_node;
+                    if(solutionCheck){
+                        goto rat;
+                    }
+                }
+                else{
+                    cout << "*BAGELDOG*" << endl;
+                    updateContainers(curr_node);
+                    exploreShipNodes(curr_node, containers.at(i));
+                }
+            }
+            //is there containers floating? 
+            //yes -> push the non-floating containers to unexplored
+            //call a function that loops through explored_ship_states and added the non-floating states to unexplored
+            //unexplored_ship_states.push(curr_node);
+            queueNonFloatingStates(containers.at(i));
+            curr_node = unexplored_ship_states.top();
+        }
         
-        if(balanceCheck(curr_node)){
-            cout << "*BAGELRAT*" << endl;
-            solutionCheck = true;
-            solution_node = curr_node;
-        }
-        else{
-            cout << "*BAGELDOG*" << endl;
-            exploreShipNodes(curr_node);
-        }
     }
+    rat:;
     final_ship_state = solution_node;
     cout << final_ship_state;
 
@@ -229,42 +248,32 @@ bool Problem::balanceCheck(ShipNode& node){
 
 
 //calls the ShipNode operations and creates new ship nodes to add to queue
-void Problem::exploreShipNodes(ShipNode& node){
+void Problem::exploreShipNodes(ShipNode& node, Container& box){
     //basically check if the up,down,left,right containers has freespot=true
     //if so call the up,down,left,right functions and push to queue
     //check for duplicates!! just create the node as normal then call the == and if so, dont push to queue
-    for(int i = 0; i < containers.size(); i++){
-        // int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
-        // int index_coord_x = containers.at(i).final_x-1;
-        int index_coord_y = get_y_coord(node, containers.at(i));
-        int index_coord_x = get_x_coord(node, containers.at(i));
-        cout << "Initial Indexes:" << index_coord_y << "," << index_coord_x << "\n";
-
-
+        int index_coord_y = get_y_coord(node, box);
+        int index_coord_x = get_x_coord(node, box);
         bool boundaryUp = index_coord_y > 0 && node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true;
-  
         //if a container can't move up, it should not be able to move at all !
         //move up & all the way down OR UP + L,R & Down
-        if(checkUp(node, containers.at(i))){
-            cout << containers.at(i) << endl;
-            ShipNode final_ship_node = up(node, containers.at(i));
-            //every container must be placed down before being added to unexplored queue
-            //ShipNode final_ship_node = down(new_ship_node, containers.at(i));
-            
-            if(!checkDuplicate(final_ship_node)){
-                unexplored_ship_states.push(final_ship_node);
+        if(boundaryUp){
+            bool checkU = node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true;
+            if(checkU){
+                cout << box << endl;
+                ShipNode final_ship_node = up(node, box);
+                if(!checkDuplicate(final_ship_node)){
+                    unexplored_ship_states.push(final_ship_node);
+                }
             }
         }
-
         //move left & all the way down
 
-        bool checkL = index_coord_x > 0 && node.default_ship_state[index_coord_y][index_coord_x-1].free_spot == true;
         bool boundaryL = index_coord_x > 0;
         if(boundaryUp && boundaryL){
+            bool checkL = index_coord_x > 0 && node.default_ship_state[index_coord_y][index_coord_x-1].free_spot == true;
             if(checkL){
-                ShipNode new_ship_node = left(node, containers.at(i));
-                //every container must be placed down before being added to unexplored queue
-                ShipNode final_ship_node = down(new_ship_node, containers.at(i));
+                ShipNode final_ship_node = left(node, box);
                 if(!checkDuplicate(final_ship_node)){
                     unexplored_ship_states.push(final_ship_node);
                 }
@@ -272,32 +281,29 @@ void Problem::exploreShipNodes(ShipNode& node){
         }
         //move right & all the way down
 
-        bool checkR = node.default_ship_state[index_coord_y][index_coord_x+1].free_spot == true;
         bool boundaryR = index_coord_x < node.default_ship_state[0].size()-1;
         if(boundaryUp && boundaryR){
+            bool checkR = node.default_ship_state[index_coord_y][index_coord_x+1].free_spot == true;
             if(checkR){
-                ShipNode new_ship_node = right(node, containers.at(i));
-                //every container must be placed down before being added to unexplored queue
-
-                ShipNode final_ship_node = down(new_ship_node, containers.at(i));
+                ShipNode final_ship_node = right(node, box);
                 if(!checkDuplicate(final_ship_node)){
                     unexplored_ship_states.push(final_ship_node);
                 }
             }
         }
 
-            // //keep moving the container down until it is placed on the ship floor, container, or NAN
-            // //while(checkDown(node, containers.at(i))){
-            // if(checkDown(node, containers.at(i))){
-            //     //cout << checkDown(node, containers.at(i)) << endl;
-            //     ShipNode new_ship_node = down(node, containers.at(i));
-            //     if(!checkDuplicate(new_ship_node)){
-            //         //cout << "BIRD_D" <<endl;
-            //         unexplored_ship_states.push(new_ship_node);
-            //     }
-            // }
-        
-    }
+        bool boundaryD = index_coord_y < node.default_ship_state.size()-1;
+        if(boundaryD){
+            bool checkD = node.default_ship_state[index_coord_y+1][index_coord_x].free_spot == true;
+            if(checkD){
+                cout << box << endl;
+                ShipNode final_ship_node = down(node, box);
+                if(!checkDuplicate(final_ship_node)){
+                    unexplored_ship_states.push(final_ship_node);
+                }
+            }
+        }
+
 
 };
 
@@ -480,32 +486,16 @@ ShipNode Problem::down(const ShipNode &node, Container& box){
     ShipNode new_ship_node = node;
     int index_coord_y = get_y_coord(new_ship_node, box);
     int index_coord_x = get_x_coord(new_ship_node, box);
-    /* moving the container down until below it free_spot = false */
-    cout << "*(" << index_coord_y <<","<< index_coord_x << ")*" <<endl;
 
-    while( index_coord_y+1 < new_ship_node.default_ship_state.size() && new_ship_node.default_ship_state[index_coord_y+1][index_coord_x].free_spot == true){
-        cout << "BIRD_D" <<endl;
-        //keep swapping with container below
-        swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y+1, index_coord_x);
-        
-        //update final y for container
-        //box.final_y -= 1;
+    cout << "Bringing Down" <<endl;
+    //keep swapping with container below
+    swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y+1, index_coord_x);
 
-        //increate the cost 
-        new_ship_node.cost += 1;
-
-        //finds & updates final y and final x for all containers
-        updateContainers(new_ship_node);
-
-        index_coord_y = get_y_coord(new_ship_node, box);
-        index_coord_x = get_x_coord(new_ship_node, box);
-        cout << "(" << index_coord_y << "," << index_coord_x << ")\n";
-        
-    }
-
-    index_coord_y = get_y_coord(new_ship_node, box);
-    index_coord_x = get_x_coord(new_ship_node, box);
-    cout << "FINAL_DOWN(" << index_coord_y <<","<< index_coord_x << ")FINAL_DOWN" <<endl;
+    //finds & updates final y and final x for all containers
+    updateContainers(new_ship_node);
+    
+    //increate the cost 
+    new_ship_node.cost += 1;
 
     //finds & updates final y and final x for all containers
     //findContainers(new_ship_node);
@@ -590,7 +580,7 @@ ShipNode Problem::left(const ShipNode &node, Container& box){
     //swap the container to the left of it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
     //return the temp
-    cout << "BIRD_L" <<endl;
+    cout << "Bringing Left" <<endl;
     ShipNode new_ship_node = node;
     //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
     //find the index coordinate for y and x
@@ -634,7 +624,7 @@ ShipNode Problem::right(const ShipNode &node, Container& box){
     //reset cost, parent, heurisitic?? -> call calculateShipNode
     //return the temp
 
-    cout << "BIRD_R" <<endl;
+    cout << "Bringing Right" <<endl;
     ShipNode new_ship_node = node;
 
     //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
@@ -646,14 +636,12 @@ ShipNode Problem::right(const ShipNode &node, Container& box){
     //swap the containers (this function updates their final y and final x too, dw queen)
     swapContainers(new_ship_node, index_coord_y, index_coord_x, index_coord_y, index_coord_x+1);
 
-    
     //update final x for container
     //box.final_x += 1;
 
 
     //finds & updates final y and final x for all containers
     updateContainers(new_ship_node);
-    
     //increate the cost 
     new_ship_node.cost += 1;
 
