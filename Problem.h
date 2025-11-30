@@ -211,6 +211,10 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
+    bool solutionCheck = false;
+
+    //check if a state has floating the container
+    bool floatingState(ShipNode& node,Container& box);
 
     void queueNonFloatingStates( Container& box);
     //finds all the containers in the ship & adds it to the containers list
@@ -223,7 +227,12 @@ public:
     void updatefreeSpots(ShipNode& node);
 
     //search algo function 
-    void searchSolutionPath(ShipNode& node);
+    //void searchSolutionPath(ShipNode& node);
+
+    //search algo function 
+    ShipNode searchSolutionPath(ShipNode& node, Container& box);
+
+    void findFinalPath(ShipNode& node);
 
     ShipNode returnSolutionNode();
 
