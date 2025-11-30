@@ -215,6 +215,9 @@ public:
     //finds all the containers in the ship & adds it to the containers list
     void findContainers(const ShipNode& node);
 
+    //updates the final x and y of containers
+    void updateContainers(const ShipNode& node);
+
     //finds all the unused containers, sets their free spots to true
     void updatefreeSpots(ShipNode& node);
 
