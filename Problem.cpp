@@ -238,9 +238,10 @@ void Problem::exploreShipNodes(ShipNode& node){
         // int index_coord_x = containers.at(i).final_x-1;
         int index_coord_y = get_y_coord(node, containers.at(i));
         int index_coord_x = get_x_coord(node, containers.at(i));
-        cout << "DONUT(" << index_coord_y << "," << index_coord_x << ")DONUT\n";
+        cout << "Initial Indexes:" << index_coord_y << "," << index_coord_x << "\n";
 
-        bool boundaryUp = node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true;
+
+        bool boundaryUp = index_coord_y > 0 && node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true;
   
         //if a container can't move up, it should not be able to move at all !
         //move up & all the way down OR UP + L,R & Down
@@ -257,7 +258,7 @@ void Problem::exploreShipNodes(ShipNode& node){
 
         //move left & all the way down
 
-        bool checkL = node.default_ship_state[index_coord_y][index_coord_x-1].free_spot == true;
+        bool checkL = index_coord_x > 0 && node.default_ship_state[index_coord_y][index_coord_x-1].free_spot == true;
         bool boundaryL = index_coord_x > 0;
         if(boundaryUp && boundaryL){
             if(checkL){
@@ -420,7 +421,7 @@ ShipNode Problem::up(const ShipNode &node, Container& box){
     //swap the container above it with it
     //reset cost, parent, heurisitic?? -> call calculateShipNode
     //return the temp
-    cout << "BIRD_U" <<endl;
+    cout << "Bringing Up" <<endl;
     ShipNode new_ship_node = node;
     //y coords (8-1) -> index (0-7) & x coords (1-12) -> index (0-11)
     //find the index coordinate for y and x
