@@ -16,15 +16,26 @@
 using namespace std;
 using namespace std::chrono;
 
+//helper function to trim spacing for name
+// string trim(const string& s) {
+//     size_t start = s.find_first_not_of(" \t\r\n");
+//     size_t end = s.find_last_not_of(" \t\r\n");
+//     if (start == string::npos) return "";
+//     return s.substr(start, end - start + 1);
+// }
+
 
 int main(){
 
     //2D array 
 
     //lol i lied we can't have a 2D array of type object -> we shall make it a vector
-    //when populating the vector, we need to make sure its [8][12] strict
+    //when populating the vector, we need to make sure its [8][12] strict (9 x 12 for air)
     //Container ship[8][12];
-    vector<vector<Container>> initial_ship_state(8, vector<Container>(12));
+    //vector<vector<Container>> initial_ship_state(9, vector<Container>(12));
+
+    //TEST
+    vector<vector<Container>> initial_ship_state(3, vector<Container>(4));
 
    //vector<vector<Container>> small_ship_state(2, vector<Container>(4));
 
@@ -104,38 +115,47 @@ int main(){
     //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
 
     //cause the the y is lwk upside down, top row is row 8 (index 7), and bottom row is 1 (index 0)
-    for(int i = 7; i >= 0; i--){
+    for(int i = 2; i >= 0; i--){
         //there should be 12 objects in every tempVec, then tempVect should get reset
         //vector<Container> tempVec;
         
-        for(int j = 0; j < 12; j++){
+        for(int j = 0; j < 4; j++){
 
-            //validation check needed here !!
-            // function made to read in each line of the file
-            //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
-                    //feed in the [] , {} into this char
-            char discard_element;
-            
+            if(i==0){
+                Container unused_object(initial_ship_state.size(), j+1, 0, "UNUSED"); 
 
-            //take in the [y,x],
-            file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
-
-            //take in the {weight}
-            file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
-            
-            //take in the NAME (getline b/c it can have spaces)
-            getline(file, inputfile_name);
-
-            //create container with given info
-            Container container_object(inputfile_y, inputfile_x, inputfile_weight, inputfile_name); 
-
-            if(inputfile_name == "UNUSED"){
-                container_object.free_spot = true;
+                initial_ship_state[i][j] = unused_object;
             }
+            else{
 
-            //put the container object into a vector<vector<Container>> shipNode
-            //tempVec.push_back(container_object);
-            initial_ship_state[i][j] = container_object;
+                //validation check needed here !!
+                // function made to read in each line of the file
+                //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
+                        //feed in the [] , {} into this char
+                char discard_element;
+                
+
+                //take in the [y,x],
+                file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
+
+                //take in the {weight}
+                file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
+                
+                //take in the NAME (getline b/c it can have spaces)
+                getline(file, inputfile_name);
+
+                //create container with given info
+                Container container_object(inputfile_y, inputfile_x, inputfile_weight, inputfile_name); 
+                //string name = trim(inputfile_name);
+                // if(name == "UNUSED"){
+                //     Container container_object();
+                //     //container_object.free_spot = true;
+                // }
+
+                //put the container object into a vector<vector<Container>> shipNode
+                //tempVec.push_back(container_object);
+                initial_ship_state[i][j] = container_object;
+            }
         }
         //append each tempVec to the 2D vector 
         //initial_ship_state.push_back(tempVec);
@@ -146,16 +166,7 @@ int main(){
 
     //close the file
     file.close();
-
-    /*
-    //output validation check for ship state (guys i kinda ate with the output stuff, logfile bout to look firee)
-    for (size_t i = 0; i < initial_ship_state.size(); ++i) { 
-        for (size_t j = 0; j < initial_ship_state[i].size(); ++j) { 
-            cout << initial_ship_state[i][j] << " "; 
-        }
-        cout << endl;
-    }
-    */
+    
 
     //turn the 2D vector object into a Ship Node, and start the algooo
     ShipNode initial_node(initial_ship_state);
@@ -165,8 +176,79 @@ int main(){
     //find all the containers in the initial ship
     p.findContainers(initial_node);
 
+    //updates the unused containers free spots
+    p.updatefreeSpots(initial_node);
+
+    //p.printContainersList(initial_node);
     //calculate all weights for the ship
     p.calculateShipNode(initial_node);
+
+    p.printCalculations(initial_node);
+
+    ShipNode result = initial_node;
+
+    //cout << "------------------------------------" << endl;
+   //p.printContainersList(result);
+
+    if(p.balanceCheck(initial_node)){
+        result = initial_node;
+    }
+    else{
+        cout << "Search for Solution..." << endl;
+        p.searchSolutionPath(initial_node);
+        result = p.returnSolutionNode();
+    }
+
+    //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
+
+    //p.swapContainers(result, 2, 0, 1, 0);
+    //p.findContainers(result);
+    // cout << "------------------------------------" << endl;
+    // //p.printContainersList(result);
+
+
+    // //result = p.up(initial_node, initial_node.default_ship_state[1][0]);
+    // //p.swapContainers(result, 0, 0, 1, 0);
+
+    /* TESTING THE MOVEMENT OPERATIONS */
+
+    // cout << "---------------inital node---------------------" << endl;
+    // // //p.printContainersList(result);
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+    // result = p.up(initial_node, initial_node.default_ship_state[1][0]);
+
+    // cout << "-----------------result node: up-------------------" << endl;
+    
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+    // result = p.down(result, result.default_ship_state[0][0]);
+
+    // cout << "-----------------result node: down-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+    // result = p.right(result, result.default_ship_state[1][0]);
+
+    // cout << "-----------------result node: right-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+
+
+    // result = p.left(result, result.default_ship_state[1][1]);
+
+    // cout << "-----------------result node: right-------------------" << endl;
+    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
+    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
+    
+    /* END OF TESTING THE MOVEMENT OPERATIONS */
+    
+    cout << "Solution Found! Solution is written to output.txt" << endl;
+    p.printCalculations(result);
+
+
 
     // if(p.balanceCheck(initial_node)){
     //     cout << "BALANCED";
@@ -194,20 +276,20 @@ int main(){
 
     /* unlock when necessary: writing to output file */
 
-    // string output_file;
-    // cout << "Enter output file name: ";
-    // cin >> output_file;
+    string output_file;
+    output_file = "output.txt";
 
-    // ofstream out(output_file);
-    // if (!out.is_open()) {
-    //     cout << "Could not open output file: " << output_file << endl;
-    //     return 1;
-    // }
+    ofstream out(output_file);
+    if (!out.is_open()) {
+        cout << "Could not open output file: " << output_file << endl;
+        return 1;
+    }
 
     
-    // out << initial_node; 
+    out << result; 
+    //out << initial_node;
 
-    // out.close();
+    out.close();
 
 
 

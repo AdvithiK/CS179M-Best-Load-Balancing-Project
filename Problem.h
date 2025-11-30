@@ -6,6 +6,9 @@
 #include <stack>
 #include <cmath>
 #include <iomanip>
+#include <vector>
+#include <string>
+#include <utility>
 
 using namespace std;
 
@@ -57,7 +60,7 @@ struct Container{
         //saving the format of the current output 
         ios oldState(nullptr);
         oldState.copyfmt(out);
-        out << "[" << setw(2) << setfill('0') << box.initial_y << "," << setw(2) << setfill('0') << box.initial_x << "]" << ", " 
+        out << "[" << setw(2) << setfill('0') << box.final_y << "," << setw(2) << setfill('0') << box.final_x << "]" << ", " 
         << "{" << setw(5) << setfill('0') << box.weight << "}" << ", " << box.name;
         //restoring the format of the current output 
         out.copyfmt(oldState);
@@ -66,17 +69,17 @@ struct Container{
 
     //operators
 
-    bool operator==(const Container& rhs){
+    bool operator==(const Container& rhs) const{
         bool twinsies = true;
-        if (!(weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x)){
+        if (!(weight == rhs.weight && final_y == rhs.final_y && final_x == rhs.final_x)){
             twinsies = false;
         }
         return twinsies;
     }
 
-    bool operator!=(const Container& rhs){
+    bool operator!=(const Container& rhs) const{
         bool twinsies = false;
-        if (weight == rhs.weight && initial_y == rhs.initial_y && initial_x == rhs.initial_x){
+        if (weight == rhs.weight && final_y == rhs.final_y && final_x == rhs.final_x){
             twinsies = true;
         }
         return twinsies;
@@ -88,19 +91,23 @@ struct Container{
 struct ShipNode{
 
     //deafult object shape for each ShipNode
-    vector<vector<Container>> default_ship_state = vector<vector<Container>>(8, vector<Container>(12));
+    //vector<vector<Container>> default_ship_state = vector<vector<Container>>(8, vector<Container>(12));
+
+    //TEST
+    vector<vector<Container>> default_ship_state = vector<vector<Container>>(3, vector<Container>(4));
+
 
     // //stores a list of containers in the ship (pointers? im doing copies for time being)
     // vector<Container> containers;
     
     //highkey don't remember much on pointers. isabelleeeeee helpppp plzzzz
-    ShipNode* parent;
+    //ShipNode* parent;
+
+    //hold the index of the parent
+    int parent;
 
     //total weight on the ship node
     int sum_weight;
-
-    //total difference of p_side - s_side
-    int difference_weight;
 
     //total weight on the port side
     int p_side_weight;
@@ -171,8 +178,10 @@ struct ShipNode{
 
 
 
-    ShipNode(): parent(nullptr), sum_weight(0), difference_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0), default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
-    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node) {};
+    //if we make parent a pointer, change it here 
+    //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(3, vector<Container>(4))), parent(-1), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(-1), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
 
 
 
@@ -202,11 +211,20 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
+
     //finds all the containers in the ship & adds it to the containers list
-    void findContainers(ShipNode& node);
+    void findContainers(const ShipNode& node);
+
+    //updates the final x and y of containers
+    void updateContainers(const ShipNode& node);
+
+    //finds all the unused containers, sets their free spots to true
+    void updatefreeSpots(ShipNode& node);
 
     //search algo function 
     void searchSolutionPath(ShipNode& node);
+
+    ShipNode returnSolutionNode();
 
     //calculates the heuristics, p side and s side etc...
     void calculateShipNode(ShipNode& node);
@@ -214,33 +232,53 @@ public:
     //calls the ShipNode operations and creates new ship nodes to add to queue
     void exploreShipNodes(ShipNode& node);
 
-    //repeatedly calls the container to be moved down until container is not floating
-    void moveShipNodeDown(ShipNode& node);
+    //swaps the Container objects & updates final y & x for both Container objects
+    void swapContainers(ShipNode& node, int prev_y, int prev_x, int new_y, int new_x);
 
     //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
     void traceSolutionPath(ShipNode& node);
 
     //checker to see if containers was populated
-    void printContainersList();
+    //DONE
+    void printContainersList(ShipNode& node);
 
+    //checker to see all calculations for a node
+    //DONE
     void printCalculations(ShipNode& node);
 
+    //checks the balance of the ship
+    //DONE
     bool balanceCheck(ShipNode& node);
 
+    //checks if a duplicate node exists
+    bool checkDuplicate(ShipNode& node);
+
+    //validation checks for movement operations
+    //check if there is a free spot above a container
+    bool checkUp(const ShipNode &node, const Container& box);
+
+    //check if there is a free spot left of a container
+    bool checkLeft(const ShipNode &node, const Container& box);
+    
+    //check if there is a free spot right of a container
+    bool checkRight(const ShipNode &node, const Container& box);
+
+    //check if there is a free spot below a container
+    bool checkDown(const ShipNode &node, const Container& box);
 
 
     //movements for different states of ShipNode
     //up
-    ShipNode up(const ShipNode &node);
+    ShipNode up(const ShipNode &node, Container& box);
     
     //down
-    ShipNode down(const ShipNode &node);
+    ShipNode down(const ShipNode &node,Container& box);
     
     //left
-    ShipNode left(const ShipNode &node);
+    ShipNode left(const ShipNode &node, Container& box);
     
     //right
-    ShipNode right(const ShipNode &node);
+    ShipNode right(const ShipNode &node, Container& box);
 
 
 
