@@ -197,7 +197,7 @@ int main(){
         cout << "Search for Solution..." << endl;
         //p.searchSolutionPath(initial_node);
         //result = p.returnSolutionNode();
-        p.findFinalPath(result);
+        p.findFinalPath(initial_node);
     }
 
     //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);

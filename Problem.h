@@ -203,6 +203,9 @@ public:
     //stores a list of containers in the ship (pointers? im doing copies for time being)
     vector<Container> containers;
 
+    //priority based on lowest cost states of final box movement nodes
+    priority_queue<ShipNode> unexplored_final_box_states;
+
     //priority based on lowest cost states
     priority_queue<ShipNode> unexplored_ship_states;
 
@@ -230,7 +233,7 @@ public:
     //void searchSolutionPath(ShipNode& node);
 
     //search algo function 
-    ShipNode searchSolutionPath(ShipNode& node, Container& box);
+    void searchSolutionPath(ShipNode& node, Container& box);
 
     void findFinalPath(ShipNode& node);
 

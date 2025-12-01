@@ -142,24 +142,32 @@ bool Problem::floatingState(ShipNode& node, Container& box){
 }
 
 void Problem::findFinalPath(ShipNode& node){
-    ShipNode new_node = node;
+    // unexplored_final_box_states
+    //solutionCheck is a global bool check so both functions can alter it if needed
+    ShipNode new_node;
     ShipNode solution_node;
-    while(!solutionCheck){
+    unexplored_final_box_states.push(node);
+    explored_ship_states.push_back(node);
+
+    while(!unexplored_final_box_states.empty() && !solutionCheck){
+
+        new_node = unexplored_final_box_states.top();
+        unexplored_final_box_states.pop();
+
+        if(balanceCheck(new_node)){
+            cout << "*BAGELRAT*" << endl;
+            solutionCheck = true;
+            solution_node = new_node;
+            goto success;
+        }
         for(int i = 0; i < containers.size(); i++){
+
             int index_coord_y = get_y_coord(node, containers.at(i));
             int index_coord_x = get_x_coord(node, containers.at(i));
             cout << "Initial Indexes:" << index_coord_y << "," << index_coord_x << "\n";
+
             if(checkUp(new_node, containers.at(i))){
-                //new_node = searchSolutionPath(new_node, containers.at(i));
-                if(balanceCheck(new_node)){
-                    cout << "*BAGELRAT*" << endl;
-                    solutionCheck = true;
-                    solution_node = new_node;
-                    goto success;
-                }
-                else{
-                    new_node = searchSolutionPath(new_node, containers.at(i));
-                }
+                searchSolutionPath(new_node, containers.at(i));
             }
         }
     }
@@ -171,11 +179,9 @@ void Problem::findFinalPath(ShipNode& node){
 
 
 //search algo function, a* algo
-ShipNode Problem::searchSolutionPath(ShipNode& node, Container& box){
+void Problem::searchSolutionPath(ShipNode& node, Container& box){
 
-    bool floatingCheck = true;
     ShipNode curr_node = node;
-    ShipNode solution_node;
 
     unexplored_ship_states.push(node);
     //cout << "*" << unexplored_ship_states.size() << "*" << endl;
@@ -183,15 +189,15 @@ ShipNode Problem::searchSolutionPath(ShipNode& node, Container& box){
     while(!unexplored_ship_states.empty()){
 
         cout << "!*\n\n"<< unexplored_ship_states.top() << "*!" << endl;
+
         curr_node = unexplored_ship_states.top();
         unexplored_ship_states.pop();
         explored_ship_states.push_back(curr_node);
-        
-        if(!floatingCheck){
+
+        cout << "** why me **  " << (curr_node == initial_ship_state) << "  ** why me **" << endl;
+        if(!checkDown(curr_node, box) && !(curr_node == initial_ship_state) ){
             cout << "*BAGELBIRD*" << endl;
-            floatingCheck = floatingState(curr_node, box);
-            //solution_node = curr_node;
-            goto rat;
+            unexplored_final_box_states.push(curr_node);
         }
         else{
             cout << "*BAGELDOG*" << endl;
@@ -200,8 +206,6 @@ ShipNode Problem::searchSolutionPath(ShipNode& node, Container& box){
         }
 
     }
-    rat:;
-    return curr_node;
 
 };
 
