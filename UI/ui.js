@@ -3,15 +3,10 @@ const ctx = canvas.getContext("2d");
 
 const rows = 8;      
 const cols = 12;     
-const colWidth = canvas.width/cols
-const rowLength = canvas.height/rows
+const colWidth = canvas.width/cols;
+const rowLength = canvas.height/rows;
+let firstEnter = false;
 
-// examples
-const containers = [
-    { name: "A1", x: 0, y: 0 },
-    { name: "B3", x: 2, y: 1 },
-    { name: "C7", x: 6, y: 3 }
-];
 
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -46,24 +41,119 @@ function drawEmptyContainers() {
       ctx.fillStyle = "black";
       ctx.fillStyle = "grey";
     });
+
 }
 
-function drawContainer() {
-    ctx.fillStyle = "grey"; // edit this -> each box gets some ID mapped to the color ?
-    ctx.strokeStyle = "black";
+function drawContainers() {
+  const colors = [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "orange",
+    "purple",
+    "pink",
+    "cyan",
+    "magenta",
+    "lime",
+    "teal",
+    "brown",
+    "gold",
+    "navy",
+    "olive",
+    "coral",
+  ];
 
-    containers.forEach(con => {
-      let px = con.x * colWidth;    
-      let py = (rows - 1 - con.y) * rowLength;  // y starts from the bottom
 
-      ctx.fillRect(px, py, colWidth, rowLength);
-      ctx.strokeRect(px, py, colWidth, rowLength);
+    fetch("data.json")
+      .then(response => response.json())
+      .then(containers => {
+          let colorIndex = 0;
+          containers.forEach(con => {
+          let px = con.x * colWidth;    
+          let py = (rows - 1 - con.y) * rowLength;  // y starts from the bottom
 
-      ctx.fillStyle = "black";
-      ctx.fillStyle = "grey";
-    });
+          // *** some kind of check if the function is NaN or not ***
+          ctx.fillStyle = colors[colorIndex];
+          colorIndex++;
+
+          ctx.fillRect(px, py, colWidth, rowLength);
+          ctx.strokeRect(px, py, colWidth, rowLength);
+
+          ctx.fillStyle = "black";           
+          ctx.font = "27px Arial";           
+          ctx.fillText(con.name, px + 5, py+25); 
+        });
+
+      });
 }
 
 
-drawGrid();
-drawEmptyContainers();
+function showInitialScreen() {
+    document.getElementById("initial-screen").style.display = "block";
+    document.getElementById("ready-screen").style.display = "none";
+    document.getElementById("next-move-screen").style.display = "none";
+    drawGrid();
+}
+
+function showReadyScreen() {
+    document.getElementById("initial-screen").style.display = "none";
+    document.getElementById("ready-screen").style.display = "block";
+    document.getElementById("next-move-screen").style.display = "none";
+    drawGrid();
+}
+
+function nextMoveScreen() {
+  document.getElementById("initial-screen").style.display = "none";
+  document.getElementById("ready-screen").style.display = "none";
+  document.getElementById("next-move-screen").style.display = "block";
+  drawGrid();
+  drawContainers();
+}
+
+async function updatetoReady() {
+    try {
+        const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
+        const data = await res.json();
+
+        // change this to showNextNodeScreen()
+        showReadyScreen();
+
+        // update top text
+        
+
+    } catch (err) {
+        console.log("Still loading...");
+        showInitialScreen();
+    }
+}
+
+async function updateData() {
+    try {
+        const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
+        const data = await res.json();
+
+        showReadyScreen();
+        
+
+    } catch (err) {
+        console.log("Still loading...");
+        showInitialScreen();
+    }
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      if (!firstEnter) {
+        updatetoReady();
+        firstEnter = true;
+      } else {
+        nextMoveScreen();
+      }
+    }
+  
+});
+
+
+showInitialScreen();
+

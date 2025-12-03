@@ -1,5 +1,3 @@
-//lol 
-
 #include "Problem.h"
 #include <iostream>
 
@@ -139,6 +137,7 @@ void Problem::searchSolutionPath(ShipNode& node){
     //cout << "*" << unexplored_ship_states.size() << "*" << endl;
 
     while(!unexplored_ship_states.empty() && !solutionCheck){
+        
         cout << "!*"<< unexplored_ship_states.top() << "*!" << endl;
         curr_node = unexplored_ship_states.top();
         unexplored_ship_states.pop();
@@ -344,7 +343,13 @@ bool Problem::checkDuplicate(ShipNode& node){
 }
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-void Problem::traceSolutionPath(ShipNode& node){};
+void Problem::traceSolutionPath(ShipNode& node){
+    cout << "TRACING: ____________________" << endl;
+    while (!solution_path.empty()) {
+        cout << solution_path.top() << endl;
+        solution_path.pop();
+    }
+}
 
 
 //check if there is a free spot above a container
@@ -671,3 +676,30 @@ ShipNode Problem::right(const ShipNode &node, Container& box){
     //return a new node !
     return new_ship_node;
 };
+
+
+
+
+void Problem::setUI(const ShipNode &node) {
+    // alter the json file
+    // call the javascript functions to rewrite the UI
+    // eventually make it so it runs in the runthrough of the answer & gets called when enter is hit
+
+    json shipData;
+    // need shipname ? 
+    for(int i = 0; i < containers.size(); i++){
+        shipData[i]["name"] = containers[i].weight;
+        shipData[i]["x"] = get_x_coord(node, containers.at(i));
+        shipData[i]["y"] = get_y_coord(node, containers.at(i))-1;
+    }
+
+    std::ofstream file("UI/data.json");
+    file << shipData.dump(4); 
+    file.close();
+
+    // call the js code ?
+
+
+}
+
+void alterLog(string comment) {}
