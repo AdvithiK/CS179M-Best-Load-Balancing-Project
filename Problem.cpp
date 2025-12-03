@@ -1,5 +1,3 @@
-//lol 
-
 #include "Problem.h"
 #include <iostream>
 

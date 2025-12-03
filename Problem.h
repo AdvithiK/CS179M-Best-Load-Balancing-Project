@@ -9,6 +9,10 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "UI/json.hpp"
+#include <fstream>
+
+using json = nlohmann::json;
 
 using namespace std;
 
@@ -239,6 +243,10 @@ public:
     //DONE
     bool balanceCheck(ShipNode& node);
 
+
+    void setUI(const ShipNode &node);
+
+    void alterLog(string comment);
 
 
 

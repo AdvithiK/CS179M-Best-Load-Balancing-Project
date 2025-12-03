@@ -21,6 +21,7 @@ h1 {
 #ShipBox {
 
     border: 2px solid black;
-    height: auto;     
-    display: block;
+    position: fixed;
+    bottom: 20px;       /* margin from the bottom */
+   
 }
