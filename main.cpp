@@ -29,15 +29,10 @@ int main(){
 
     //2D array 
 
-    //lol i lied we can't have a 2D array of type object -> we shall make it a vector
     //when populating the vector, we need to make sure its [8][12] strict (9 x 12 for air)
     //Container ship[8][12];
-    //vector<vector<Container>> initial_ship_state(9, vector<Container>(12));
+    vector<vector<Container>> initial_ship_state(9, vector<Container>(12));
 
-    //TEST
-    vector<vector<Container>> initial_ship_state(3, vector<Container>(4));
-
-   //vector<vector<Container>> small_ship_state(2, vector<Container>(4));
 
     //Prompt user to Enter a Manifest
 
@@ -114,15 +109,14 @@ int main(){
 
     //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
 
-    //cause the the y is lwk upside down, top row is row 8 (index 7), and bottom row is 1 (index 0)
-    for(int i = 2; i >= 0; i--){
+    for(int i = 8; i >= 0; i--){
         //there should be 12 objects in every tempVec, then tempVect should get reset
         //vector<Container> tempVec;
         
-        for(int j = 0; j < 4; j++){
+        for(int j = 0; j < 12; j++){
 
             if(i==0){
-                Container unused_object(initial_ship_state.size(), j+1, 0, "UNUSED"); 
+                Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
 
                 initial_ship_state[i][j] = unused_object;
             }
@@ -145,7 +139,7 @@ int main(){
                 getline(file, inputfile_name);
 
                 //create container with given info
-                Container container_object(inputfile_y, inputfile_x, inputfile_weight, inputfile_name); 
+                Container container_object(inputfile_x, inputfile_y, inputfile_weight, inputfile_name); 
                 //string name = trim(inputfile_name);
                 // if(name == "UNUSED"){
                 //     Container container_object();
@@ -174,107 +168,32 @@ int main(){
     Problem p(initial_node);
 
     //find all the containers in the initial ship
-    p.findContainers(initial_node);
+    //p.findContainers(initial_node);
 
-    //updates the unused containers free spots
-    p.updatefreeSpots(initial_node);
+    cout << initial_node.default_ship_state[8][0] << endl;
 
     //p.printContainersList(initial_node);
     //calculate all weights for the ship
-    p.calculateShipNode(initial_node);
+    //p.calculateShipNode(initial_node);
 
-    p.printCalculations(initial_node);
+    //p.printCalculations(initial_node);
 
-    ShipNode result = initial_node;
-
-    //cout << "------------------------------------" << endl;
-   //p.printContainersList(result);
-
-    if(p.balanceCheck(initial_node)){
-        result = initial_node;
-    }
-    else{
-        cout << "Search for Solution..." << endl;
-        p.searchSolutionPath(initial_node);
-        result = p.returnSolutionNode();
-    }
-
-    //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
-
-    //p.swapContainers(result, 2, 0, 1, 0);
-    //p.findContainers(result);
-    // cout << "------------------------------------" << endl;
-    // //p.printContainersList(result);
-
-
-    // //result = p.up(initial_node, initial_node.default_ship_state[1][0]);
-    // //p.swapContainers(result, 0, 0, 1, 0);
-
-    /* TESTING THE MOVEMENT OPERATIONS */
-
-    // cout << "---------------inital node---------------------" << endl;
-    // // //p.printContainersList(result);
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-
-    // result = p.up(initial_node, initial_node.default_ship_state[1][0]);
-
-    // cout << "-----------------result node: up-------------------" << endl;
-    
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-
-    // result = p.down(result, result.default_ship_state[0][0]);
-
-    // cout << "-----------------result node: down-------------------" << endl;
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-
-    // result = p.right(result, result.default_ship_state[1][0]);
-
-    // cout << "-----------------result node: right-------------------" << endl;
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-
-
-    // result = p.left(result, result.default_ship_state[1][1]);
-
-    // cout << "-----------------result node: right-------------------" << endl;
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-    
-    /* END OF TESTING THE MOVEMENT OPERATIONS */
-    
-    cout << "Solution Found! Solution is written to output.txt" << endl;
-    p.printCalculations(result);
+    //ShipNode result = initial_node;
 
 
 
     // if(p.balanceCheck(initial_node)){
-    //     cout << "BALANCED";
+    //     result = initial_node;
     // }
     // else{
-    //     cout << "NOT BALANCED";
+    //     cout << "Search for Solution..." << endl;
+    //     p.searchSolutionPath();
+    //     result = p.returnSolutionNode();
     // }
 
-
-    /* ---------------------------------------- TESTINGGGG -------------------------------------------------*/
-
-    //cout << "ur a rat" << endl;
-
-    //output the node to terminal when needed: THIS WORKKSS AHAHAHAHHAHAHAHHHA
-    //cout << initial_node;
-    //p.findContainers(initial_node);
-
-    //p.calculateShipNode(initial_node);
-    //p.printCalculations(initial_node);
-
-    /* ------------------------------------ END OF TESTINGGGG -----------------------------------------------*/
-
-
-
-
-    /* unlock when necessary: writing to output file */
+  
+    //cout << "Solution Found! Solution is written to output.txt" << endl;
+    //p.printCalculations(result);
 
     string output_file;
     output_file = "output.txt";
@@ -285,8 +204,7 @@ int main(){
         return 1;
     }
 
-    
-    out << result; 
+    out << initial_node; 
     //out << initial_node;
 
     out.close();
