@@ -171,11 +171,11 @@ bool Problem::balanceCheck(ShipNode& node){
 
 
 //search algorithm here
-void searchSolutionPath(){
+void Problem::searchSolutionPath(){
 
 };
 
-void exploreShipNodes(ShipNode& node, Container& box){};
+void Problem::exploreShipNodes(ShipNode& node, Container& box){};
 
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
