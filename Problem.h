@@ -9,6 +9,10 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "UI/json.hpp"
+#include <fstream>
+
+using json = nlohmann::json;
 
 using namespace std;
 
@@ -280,6 +284,10 @@ public:
     
     //right
     ShipNode right(const ShipNode &node, Container& box);
+
+    void setUI(const ShipNode &node);
+
+    void alterLog(string comment);
 
 
 

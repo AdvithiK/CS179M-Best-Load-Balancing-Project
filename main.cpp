@@ -10,6 +10,8 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib> 
+#include <chrono>
+#include <thread>
 
 #include "Problem.h"
 
@@ -166,7 +168,15 @@ int main(){
 
     //close the file
     file.close();
-    
+
+
+    // start up the server & open it up
+    system("python3 -m http.server 13000 &");
+    system("open http://localhost:13000/UI/index.html");
+    // use this for checking if it does the auto update (can remove later)
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+
 
     //turn the 2D vector object into a Ship Node, and start the algooo
     ShipNode initial_node(initial_ship_state);
@@ -179,6 +189,7 @@ int main(){
     //updates the unused containers free spots
     p.updatefreeSpots(initial_node);
 
+
     //p.printContainersList(initial_node);
     //calculate all weights for the ship
     p.calculateShipNode(initial_node);
@@ -186,6 +197,12 @@ int main(){
     p.printCalculations(initial_node);
 
     ShipNode result = initial_node;
+    cout << "WAAAAAAAA" << endl;
+    cout << result << endl;
+    p.printContainersList(result);
+    p.setUI(result);
+    
+    
 
     //cout << "------------------------------------" << endl;
    //p.printContainersList(result);
@@ -197,6 +214,8 @@ int main(){
         cout << "Search for Solution..." << endl;
         p.searchSolutionPath(initial_node);
         result = p.returnSolutionNode();
+        
+        
     }
 
     //swap(result.default_ship_state[2][0], result.default_ship_state[1][0]);
@@ -247,6 +266,8 @@ int main(){
     
     cout << "Solution Found! Solution is written to output.txt" << endl;
     p.printCalculations(result);
+    p.printContainersList(result);
+    
 
 
 
@@ -255,7 +276,7 @@ int main(){
     // }
     // else{
     //     cout << "NOT BALANCED";
-    // }
+    // } 
 
 
     /* ---------------------------------------- TESTINGGGG -------------------------------------------------*/

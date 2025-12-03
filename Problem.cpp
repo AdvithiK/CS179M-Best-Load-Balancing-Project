@@ -1,5 +1,3 @@
-//lol 
-
 #include "Problem.h"
 #include <iostream>
 
@@ -138,41 +136,23 @@ void Problem::searchSolutionPath(ShipNode& node){
     unexplored_ship_states.push(node);
     //cout << "*" << unexplored_ship_states.size() << "*" << endl;
 
-    for(int i = 0; i < containers.size(); i++){
-        int index_coord_y = get_y_coord(node, containers.at(i));
-        int index_coord_x = get_x_coord(node, containers.at(i));
-        cout << "Initial Indexes:" << index_coord_y << "," << index_coord_x << "\n";
-        if(checkUp(curr_node, containers.at(i))){
-            while(!unexplored_ship_states.empty()){
-                cout << "!*\n\n"<< unexplored_ship_states.top() << "*!" << endl;
-                curr_node = unexplored_ship_states.top();
-                unexplored_ship_states.pop();
-                explored_ship_states.push_back(curr_node);
-                
-                if(balanceCheck(curr_node)){
-                    cout << "*BAGELRAT*" << endl;
-                    solutionCheck = true;
-                    solution_node = curr_node;
-                    if(solutionCheck){
-                        goto rat;
-                    }
-                }
-                else{
-                    cout << "*BAGELDOG*" << endl;
-                    updateContainers(curr_node);
-                    exploreShipNodes(curr_node, containers.at(i));
-                }
-            }
-            //is there containers floating? 
-            //yes -> push the non-floating containers to unexplored
-            //call a function that loops through explored_ship_states and added the non-floating states to unexplored
-            //unexplored_ship_states.push(curr_node);
-            queueNonFloatingStates(containers.at(i));
-            curr_node = unexplored_ship_states.top();
-        }
+    while(!unexplored_ship_states.empty() && !solutionCheck){
         
+        cout << "!*"<< unexplored_ship_states.top() << "*!" << endl;
+        curr_node = unexplored_ship_states.top();
+        unexplored_ship_states.pop();
+        explored_ship_states.push_back(curr_node);
+        
+        if(balanceCheck(curr_node)){
+            cout << "*BAGELRAT*" << endl;
+            solutionCheck = true;
+            solution_node = curr_node;
+        }
+        else{
+            cout << "*BAGELDOG*" << endl;
+            exploreShipNodes(curr_node);
+        }
     }
-    rat:;
     final_ship_state = solution_node;
     cout << final_ship_state;
 
@@ -350,7 +330,13 @@ bool Problem::checkDuplicate(ShipNode& node){
 }
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-void Problem::traceSolutionPath(ShipNode& node){};
+void Problem::traceSolutionPath(ShipNode& node){
+    cout << "TRACING: ____________________" << endl;
+    while (!solution_path.empty()) {
+        cout << solution_path.top() << endl;
+        solution_path.pop();
+    }
+}
 
 
 //check if there is a free spot above a container
@@ -659,3 +645,30 @@ ShipNode Problem::right(const ShipNode &node, Container& box){
     //return a new node !
     return new_ship_node;
 };
+
+
+
+
+void Problem::setUI(const ShipNode &node) {
+    // alter the json file
+    // call the javascript functions to rewrite the UI
+    // eventually make it so it runs in the runthrough of the answer & gets called when enter is hit
+
+    json shipData;
+    // need shipname ? 
+    for(int i = 0; i < containers.size(); i++){
+        shipData[i]["name"] = containers[i].weight;
+        shipData[i]["x"] = get_x_coord(node, containers.at(i));
+        shipData[i]["y"] = get_y_coord(node, containers.at(i))-1;
+    }
+
+    std::ofstream file("UI/data.json");
+    file << shipData.dump(4); 
+    file.close();
+
+    // call the js code ?
+
+
+}
+
+void alterLog(string comment) {}

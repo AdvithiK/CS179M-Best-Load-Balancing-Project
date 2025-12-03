@@ -5,13 +5,28 @@
       <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1> [Ship Name] has [#] Containers </h1>
-    <h1> Computing a solution... </h1>
+    <div id="initial-screen">
+      <h1> [Ship Name] has [#] Containers </h1>
+      <h1> Computing a solution... </h1> 
+    </div>
+
+    <div id="ready-screen">
+      <h1> Solution has been found, it will take </h1>
+      <h1> [x] move(s) </h1> 
+      <h1> [x] minute(s) </h1> 
+      <h1> Hit ENTER when ready for first move </h1> 
+    </div>
+
+     <div id="next-move-screen">
+      <h1> [x] of [y] move </h1>
+      <h1> what </h1>
+    </div>
 
     <div class="program-container">
-      
       <canvas id="ShipBox"width="800" height="500"></canvas>
     </div>
+
+  
     <script src="ui.js"></script>
   </body>
 </html>
