@@ -170,10 +170,7 @@ bool Problem::balanceCheck(ShipNode& node){
 }
 
 
-//search algorithm here
-void Problem::searchSolutionPath(){
 
-};
 
 void Problem::exploreShipNodes(ShipNode& node, Container& box){
     vector<pair<int, int>> dest_list = find_dest_list(node, box);
@@ -189,7 +186,12 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         new_node.cost += abs(container_y-index_y) - abs(container_x - index_x);
 
         swap(new_node.default_ship_state[index_y][index_x], new_node.default_ship_state[index_y][index_x]);
-        //getCrane, grab the y and x indexes, swap crane with index_y-1, index_x DO IT ON NEW_NODE !!
+
+
+       //getCrane, grab the y and x indexes, swap crane with index_y-1, index_x DO IT ON NEW_NODE !!
+        int crane_y = get_y_coord(new_node, getCrane(new_node));
+        int crane_x = get_x_coord(new_node, getCrane(new_node));
+        swap(new_node.default_ship_state[crane_y][crane_x], new_node.default_ship_state[index_y-1][index_x]);
 
         //append to unexplored
         unexplored_ship_states.push(new_node);
@@ -289,7 +291,6 @@ bool Problem::checkUp(const ShipNode &node, const Container& box){
     int index_coord_x = get_x_coord(node, box);
     bool availability = false;
 
-    //if index_coord_y > 0
     if(index_coord_y > 0){
         if(node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true){
             availability = true;
@@ -321,13 +322,14 @@ void Problem::searchSolutionPath(){
         for (int c = 0; c < containers.size(); c++){
             //if crane is above c
             if(craneCheck(curr_node, containers.at(c))){
-                //explore c
+                exploreShipNodes(curr_node, containers.at(c));
+
             }
             else{
                 //if c is moveable
                 if(checkUp(curr_node, containers.at(c))){
                     moveCranetoContainer(curr_node, containers.at(c));
-                    //explore c
+                    exploreShipNodes(curr_node, containers.at(c));
                 }
 
             }
