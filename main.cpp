@@ -200,12 +200,6 @@ int main(){
     /* END OF TESTING THE MOVEMENT OPERATIONS */
     
     cout << "Solution Found! Solution is written to output.txt" << endl;
-<<<<<<< HEAD
-    //p.printCalculations(result);
-    //p.printContainersList(result);
-=======
-
->>>>>>> ab6cb936bcbe4e03b5f23c2b5c94a24673f0d463
     
 
 
