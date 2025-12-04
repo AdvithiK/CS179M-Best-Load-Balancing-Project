@@ -186,16 +186,29 @@ int main(){
     p.updatefreeSpots(initial_node);
 
     //find all the containers in the initial ship
-    //p.findContainers(initial_node);
+    p.findContainers(initial_node);
 
-    cout << initial_node.default_ship_state[8][0] << endl;
+    //cout << initial_node.default_ship_state[8][0] << endl;
 
 
     //p.printContainersList(initial_node);
     //calculate all weights for the ship
     //p.calculateShipNode(initial_node);
 
-    //p.printCalculations(initial_node);
+    p.printCalculations(initial_node);
+
+    ShipNode& result = initial_node;
+
+    if(p.balanceCheck(initial_node)){
+        cout << p.final_ship_state;
+    }
+    else{
+        cout << "Search for Solution..." << endl;
+        p.searchSolutionPath();
+
+        cout << p.final_ship_state;
+
+    }
 
     // cout << "-----------------result node: right-------------------" << endl;
     // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;

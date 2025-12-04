@@ -193,10 +193,19 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         int crane_x = get_x_coord(new_node, getCrane(new_node));
         swap(new_node.default_ship_state[crane_y][crane_x], new_node.default_ship_state[index_y-1][index_x]);
 
+        calculateShipNode(new_node);
+
+        if(balanceCheck(new_node)){
+            final_ship_state = new_node;
+            balCheck = true;
+            goto rat;
+        }
+        
         //append to unexplored
         unexplored_ship_states.push(new_node);
 
     }
+    rat:;
 
 };
 
@@ -316,10 +325,14 @@ void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
 void Problem::searchSolutionPath(){
     ShipNode curr_node;
     unexplored_ship_states.push(initial_ship_state);
-    while(!unexplored_ship_states.empty()){
+    while(!unexplored_ship_states.empty() && !balCheck){
         curr_node = unexplored_ship_states.top();
         unexplored_ship_states.pop();
         for (int c = 0; c < containers.size(); c++){
+            if(balCheck){
+                goto dog;
+            }
+            
             //if crane is above c
             if(craneCheck(curr_node, containers.at(c))){
                 exploreShipNodes(curr_node, containers.at(c));
@@ -333,10 +346,13 @@ void Problem::searchSolutionPath(){
                 }
 
             }
-        }
+        } 
         
-
     }
+    dog:;
+    final_ship_state = curr_node;
+
+
     
 };
 

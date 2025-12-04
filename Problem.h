@@ -210,8 +210,7 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
-    //search algo function 
-    void searchSolutionPath();
+    bool balCheck = false;
 
     //finds all the containers in the ship & adds it to the containers list
     void findContainers(const ShipNode& node);
@@ -263,7 +262,7 @@ public:
 
     void alterLog(string comment);
 
-    vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box) {}
+    vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);
 
 
 
