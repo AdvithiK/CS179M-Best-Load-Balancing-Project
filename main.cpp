@@ -117,13 +117,17 @@ int main(){
         
         for(int j = 0; j < 12; j++){
 
-            if(i==0 && j==0) {
-                Container crane(j, i, 0, "CRANE");
-            }
-            else if (i==0){
-                Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
+            if(i==0){
+                if(j==0){
+                    Container crane_object(j, i, 0, "CRANE"); 
 
-                initial_ship_state[i][j] = unused_object;
+                    initial_ship_state[i][j] = crane_object;
+                }
+                else{
+                    Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
+
+                    initial_ship_state[i][j] = unused_object;
+                }
             }
             else{
 
