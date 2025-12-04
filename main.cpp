@@ -117,7 +117,10 @@ int main(){
         
         for(int j = 0; j < 12; j++){
 
-            if(i==0){
+            if(i==0 && j==0) {
+                Container crane(i, j, 0, "CRANE");
+            }
+            else if (i==0){
                 Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
 
                 initial_ship_state[i][j] = unused_object;
@@ -176,6 +179,7 @@ int main(){
     ShipNode initial_node(initial_ship_state);
     //ShipNode small_initial_node(small_ship_state);
     Problem p(initial_node);
+    p.updatefreeSpots(initial_node);
 
     //find all the containers in the initial ship
     //p.findContainers(initial_node);
@@ -196,8 +200,7 @@ int main(){
     /* END OF TESTING THE MOVEMENT OPERATIONS */
     
     cout << "Solution Found! Solution is written to output.txt" << endl;
-    p.printCalculations(result);
-    p.printContainersList(result);
+
     
 
 
