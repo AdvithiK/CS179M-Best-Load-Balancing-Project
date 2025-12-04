@@ -11,6 +11,7 @@
 #include <utility>
 #include "UI/json.hpp"
 #include <fstream>
+#include <utility>
 
 using json = nlohmann::json;
 
@@ -216,6 +217,10 @@ public:
     //updates the final x and y of containers
     void updateContainers(const ShipNode& node);
 
+    bool containerBelowCrane(const ShipNode& node, Container& box);
+
+    void updatefreeSpots(ShipNode& node);
+
 
     //search algo function 
     void searchSolutionPath();
@@ -247,6 +252,8 @@ public:
     void setUI(const ShipNode &node);
 
     void alterLog(string comment);
+
+    vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box) {}
 
 
 

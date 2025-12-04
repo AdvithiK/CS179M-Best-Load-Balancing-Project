@@ -175,8 +175,85 @@ void Problem::searchSolutionPath(){
 
 };
 
-void Problem::exploreShipNodes(ShipNode& node, Container& box){};
+void Problem::exploreShipNodes(ShipNode& node, Container& box){
+    vector<pair<int, int>> dest_list = find_dest_list(node, box);
+    for (const auto& p : dest_list) {
+        int index_y = p.first;
+        int index_x = p.second;
 
+        int container_y = get_y_coord(node, box);
+        int container_x = get_x_coord(node, box);
+
+        ShipNode new_node = node;
+
+        new_node.cost += abs(container_y-index_y) - abs(container_x - index_x);
+
+        swap(new_node.default_ship_state[index_y][index_x], new_node.default_ship_state[index_y][index_x]);
+        //getCrane, grab the y and x indexes, swap crane with index_y-1, index_x DO IT ON NEW_NODE !!
+
+        //append to unexplored
+        unexplored_ship_states.push(new_node);
+
+    }
+
+};
+
+
+vector<pair<int,int>> Problem::find_dest_list(const ShipNode& node, Container& box) {
+    vector<pair<int,int>> dest_list;
+    for(int j = 0; j < 12; j++) {
+        for(int i = 8; i >= 0; i--) {
+            if (j == get_y_coord(node, box)){
+                goto end;
+            }
+
+            if (node.default_ship_state[i][j].free_spot) {
+                pair<int,int> dest = {i,j};
+                dest_list.push_back(dest);
+            }
+            end:;
+        }       
+    }
+
+    return dest_list;
+    
+
+}
+
+
+
+bool Problem::containerBelowCrane(const ShipNode& node, Container& box) {
+
+    //includes the row of air above the ship
+     for(int i = 8; i >= 0; i--){
+        for(int j = 0; j < 12; j++) {
+            if (node.default_ship_state[i][j].name == "CRANE") {
+                if (node.default_ship_state[i+1][j] == box)
+                    return true;
+                return false;
+            }
+            
+        }
+    }
+
+    cout << "CRANE is missing" << endl;
+    return false;
+
+
+}
+
+
+
+void Problem::updatefreeSpots(ShipNode& node){
+    for (int i = node.default_ship_state.size() - 1; i >= 0; --i) { 
+        for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
+            string name = trim(node.default_ship_state[i][j].name);
+            if(name == "UNUSED"){
+                node.default_ship_state[i][j].free_spot = true;
+            }
+        }
+    }
+}
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
 void Problem::traceSolutionPath(ShipNode& node){};
