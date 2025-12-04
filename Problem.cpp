@@ -173,7 +173,9 @@ bool Problem::balanceCheck(ShipNode& node){
 
 
 void Problem::exploreShipNodes(ShipNode& node, Container& box){
+    cout << "exploring possible nodes" << endl;
     vector<pair<int, int>> dest_list = find_dest_list(node, box);
+    cout << "exploring " << dest_list.size() <<" nodes" << endl;
     for (const auto& p : dest_list) {
         int index_y = p.first;
         int index_x = p.second;
@@ -196,6 +198,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         calculateShipNode(new_node);
 
         if(balanceCheck(new_node)){
+            cout << "exploring function balance check made" << endl;
             final_ship_state = new_node;
             balCheck = true;
             goto rat;
@@ -310,6 +313,7 @@ bool Problem::checkUp(const ShipNode &node, const Container& box){
 };
 
 void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
+    cout << "doing container is moveable" << endl;
     int container_y = get_y_coord(node, box);
     int container_x = get_x_coord(node, box);
     int crane_y = get_y_coord(node, getCrane(node));
@@ -318,7 +322,7 @@ void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
     node.cost += (abs(container_y-crane_y) + abs(container_x-crane_x))-1;
 
     swap(node.default_ship_state[crane_y][crane_x], node.default_ship_state[container_y-1][container_x]);
-
+    cout << "finished doing container is moveable" << endl;
 };
 
 //search algorithm here
@@ -330,17 +334,20 @@ void Problem::searchSolutionPath(){
         unexplored_ship_states.pop();
         for (int c = 0; c < containers.size(); c++){
             if(balCheck){
+                cout << "ran through balCheck" << endl;
                 goto dog;
             }
             
             //if crane is above c
             if(craneCheck(curr_node, containers.at(c))){
+                cout << "ran through craneCheck" << endl;
                 exploreShipNodes(curr_node, containers.at(c));
 
             }
             else{
                 //if c is moveable
                 if(checkUp(curr_node, containers.at(c))){
+                    cout << "ran through container is moveable" << endl;
                     moveCranetoContainer(curr_node, containers.at(c));
                     exploreShipNodes(curr_node, containers.at(c));
                 }
