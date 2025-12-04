@@ -255,5 +255,88 @@ void Problem::updatefreeSpots(ShipNode& node){
     }
 }
 
+Container Problem::getCrane(const ShipNode& node){
+    for(int i=0; i<node.default_ship_state.size(); i++){
+        for(int j=0; j<node.default_ship_state[i].size(); j++){
+            const Container& c = node.default_ship_state[i][j];
+            if(trim(c.name) == "CRANE" ){
+                return c;
+            }
+        }
+    }
+    cout << "OBJECT NOT FOUND" << endl;
+    return node.default_ship_state[0][0];
+
+}
+
+bool Problem::craneCheck(const ShipNode& node, const Container& c){
+    bool truth = false;
+
+    int container_y = get_y_coord(node, c);
+    int container_x = get_x_coord(node, c);
+    int crane_y = get_y_coord(node, getCrane(node));
+    int crane_x = get_x_coord(node, getCrane(node));
+
+    if(crane_y+1 == container_y && crane_x == container_x){
+        truth = true;
+    }
+    return truth;
+};
+
+bool Problem::checkUp(const ShipNode &node, const Container& box){
+
+    int index_coord_y = get_y_coord(node, box);
+    int index_coord_x = get_x_coord(node, box);
+    bool availability = false;
+
+    //if index_coord_y > 0
+    if(index_coord_y > 0){
+        if(node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true){
+            availability = true;
+        }
+    }
+    return availability;
+
+};
+
+void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
+    int container_y = get_y_coord(node, box);
+    int container_x = get_x_coord(node, box);
+    int crane_y = get_y_coord(node, getCrane(node));
+    int crane_x = get_x_coord(node, getCrane(node));
+
+    node.cost += (abs(container_y-crane_y) + abs(container_x-crane_x))-1;
+
+    swap(node.default_ship_state[crane_y][crane_x], node.default_ship_state[container_y-1][container_x]);
+
+};
+
+//search algorithm here
+void Problem::searchSolutionPath(){
+    ShipNode curr_node;
+    unexplored_ship_states.push(initial_ship_state);
+    while(!unexplored_ship_states.empty()){
+        curr_node = unexplored_ship_states.top();
+        unexplored_ship_states.pop();
+        for (int c = 0; c < containers.size(); c++){
+            //if crane is above c
+            if(craneCheck(curr_node, containers.at(c))){
+                //explore c
+            }
+            else{
+                //if c is moveable
+                if(checkUp(curr_node, containers.at(c))){
+                    moveCranetoContainer(curr_node, containers.at(c));
+                    //explore c
+                }
+
+            }
+        }
+        
+
+    }
+    
+};
+
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
 void Problem::traceSolutionPath(ShipNode& node){};

@@ -210,6 +210,8 @@ public:
     //stores the order of each step to the final solution state
     stack<ShipNode> solution_path;
 
+    //search algo function 
+    void searchSolutionPath();
 
     //finds all the containers in the ship & adds it to the containers list
     void findContainers(const ShipNode& node);
@@ -220,6 +222,14 @@ public:
     bool containerBelowCrane(const ShipNode& node, Container& box);
 
     void updatefreeSpots(ShipNode& node);
+
+    bool craneCheck(const ShipNode& node, const Container& c);
+
+    Container getCrane(const ShipNode& node);
+
+    bool checkUp(const ShipNode &node, const Container& box);
+
+    void moveCranetoContainer(ShipNode &node, const Container& box);
 
 
     //search algo function 
