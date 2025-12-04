@@ -116,9 +116,16 @@ int main(){
         for(int j = 0; j < 12; j++){
 
             if(i==0){
-                Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
+                if(j==0){
+                    Container crane_object(j, i, 0, "CRANE"); 
 
-                initial_ship_state[i][j] = unused_object;
+                    initial_ship_state[i][j] = crane_object;
+                }
+                else{
+                    Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
+
+                    initial_ship_state[i][j] = unused_object;
+                }
             }
             else{
 
@@ -167,10 +174,16 @@ int main(){
     //ShipNode small_initial_node(small_ship_state);
     Problem p(initial_node);
 
-    //find all the containers in the initial ship
-    //p.findContainers(initial_node);
+    //updates UNUSED containers to free spot = true
+    p.updatefreeSpots(initial_node);
 
-    cout << initial_node.default_ship_state[8][0] << endl;
+    //find all the containers in the initial ship
+    p.findContainers(initial_node);
+
+    //p.getCrane(initial_node);
+    p.moveCranetoContainer(initial_node, initial_node.default_ship_state[7][1]);
+
+    cout << initial_node.default_ship_state[6][1] << endl;
 
     //p.printContainersList(initial_node);
     //calculate all weights for the ship

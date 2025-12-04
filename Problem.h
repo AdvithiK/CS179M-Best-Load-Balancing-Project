@@ -174,7 +174,7 @@ struct ShipNode{
 
     //if we make parent a pointer, change it here (currently set to -> this, should it be nullptr?)
     //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
-    ShipNode(): default_ship_state(vector<vector<Container>>(3, vector<Container>(4))), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(9, vector<Container>(12))), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
     ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
 
 
@@ -218,6 +218,8 @@ public:
 
     ShipNode returnSolutionNode();
 
+    void updatefreeSpots(ShipNode& node);
+
     //calculates the heuristics, p side and s side etc...
     void calculateShipNode(ShipNode& node);
 
@@ -239,6 +241,13 @@ public:
     //DONE
     bool balanceCheck(ShipNode& node);
 
+    bool craneCheck(const ShipNode& node, const Container& c);
+
+    Container getCrane(const ShipNode& node);
+
+    bool checkUp(const ShipNode &node, const Container& box);
+
+    void moveCranetoContainer(ShipNode &node, const Container& box);
 
 
 
