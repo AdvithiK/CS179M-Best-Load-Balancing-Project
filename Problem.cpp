@@ -1,5 +1,3 @@
-//lol 
-
 #include "Problem.h"
 #include <iostream>
 
@@ -276,5 +274,3 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){};
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
 void Problem::traceSolutionPath(ShipNode& node){};
-
-
