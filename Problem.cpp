@@ -66,7 +66,7 @@ void Problem::findContainers(const ShipNode& node){
             //     Container temp_container = node.default_ship_state[i][j];
             //     containers.push_back(temp_container);
             // }
-            if (name != "UNUSED" && name != "NAN"){
+            if (name != "UNUSED" && name != "NAN" && name != "CRANE"){
                 Container temp_container = node.default_ship_state[i][j];
                 containers.push_back(temp_container);
             }
@@ -218,15 +218,19 @@ vector<pair<int,int>> Problem::find_dest_list(const ShipNode& node, Container& b
     for(int j = 0; j < 12; j++) {
         for(int i = 8; i >= 0; i--) {
             if (j == get_y_coord(node, box)){
-                goto end;
+                goto next_x;
             }
-
-            if (node.default_ship_state[i][j].free_spot) {
+            else if (trim(node.default_ship_state[i][j].name) == "UNUSED") {
                 pair<int,int> dest = {i,j};
                 dest_list.push_back(dest);
+                cout << "NEW DESTINATION ADDED: (" << dest.first << ", " << dest.second << ")" << endl;
+                goto next_x;
             }
-            end:;
-        }       
+            else{
+                break;
+            }
+        } 
+        next_x:;      
     }
 
     return dest_list;
@@ -303,17 +307,21 @@ bool Problem::checkUp(const ShipNode &node, const Container& box){
     int index_coord_x = get_x_coord(node, box);
     bool availability = false;
 
+    
     if(index_coord_y > 0){
         if(node.default_ship_state[index_coord_y-1][index_coord_x].free_spot == true){
             availability = true;
         }
     }
+    cout << "(" << index_coord_y-1 << ", " << index_coord_x << ")!!" << endl;
+    cout << "truth value: " << (node.default_ship_state[index_coord_y-1][index_coord_x].free_spot) << endl;
+    cout << "!!" << availability<< "!!" << endl;
     return availability;
 
 };
 
 void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
-    cout << "doing container is moveable" << endl;
+    cout << "moving crate to container" << endl;
     int container_y = get_y_coord(node, box);
     int container_x = get_x_coord(node, box);
     int crane_y = get_y_coord(node, getCrane(node));
@@ -322,17 +330,28 @@ void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
     node.cost += (abs(container_y-crane_y) + abs(container_x-crane_x))-1;
 
     swap(node.default_ship_state[crane_y][crane_x], node.default_ship_state[container_y-1][container_x]);
-    cout << "finished doing container is moveable" << endl;
+    cout << "finished moving crane to container. crane is now at: " << "(" << get_y_coord(node, getCrane(node)) << ", " << get_x_coord(node, getCrane(node)) << "). name: "<<node.default_ship_state[container_y-1][container_x].name << endl;
 };
 
 //search algorithm here
 void Problem::searchSolutionPath(){
+    cout << "in search solution path function" << endl;
     ShipNode curr_node;
     unexplored_ship_states.push(initial_ship_state);
+    cout << "size of unexplored ship states" << endl;
     while(!unexplored_ship_states.empty() && !balCheck){
+        cout << "in while loop" << endl;
         curr_node = unexplored_ship_states.top();
         unexplored_ship_states.pop();
         for (int c = 0; c < containers.size(); c++){
+            cout << "in for loop for container:" << containers.at(c) << endl;
+            int index_coord_y = get_y_coord(curr_node, containers.at(c));
+            int index_coord_x = get_x_coord(curr_node, containers.at(c));
+            //ensuring container is not going out of bounds
+            bool noboundaryUp = index_coord_y > 0;
+            //grabbing name of spot above container
+            string upspot_name = trim(curr_node.default_ship_state[index_coord_y-1][index_coord_x].name);
+            
             if(balCheck){
                 cout << "ran through balCheck" << endl;
                 goto dog;
@@ -345,18 +364,23 @@ void Problem::searchSolutionPath(){
 
             }
             else{
+                cout << "in else" << endl;
                 //if c is moveable
-                if(checkUp(curr_node, containers.at(c))){
+                cout << "truth value: " << noboundaryUp << endl;
+                if(noboundaryUp && upspot_name == "UNUSED"){
                     cout << "ran through container is moveable" << endl;
-                    moveCranetoContainer(curr_node, containers.at(c));
-                    exploreShipNodes(curr_node, containers.at(c));
+                    ShipNode crane_moved_node = curr_node;
+                    moveCranetoContainer(crane_moved_node, containers.at(c));
+                    exploreShipNodes(crane_moved_node, containers.at(c));
                 }
 
             }
+            cout << "done with 1 run of for loop" << endl;
         } 
         
     }
     dog:;
+    cout << "finished search" << endl;
     final_ship_state = curr_node;
 
 

@@ -125,7 +125,7 @@ int main(){
                 }
                 else{
                     Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
-
+                    unused_object.free_spot = true;
                     initial_ship_state[i][j] = unused_object;
                 }
             }
@@ -149,10 +149,10 @@ int main(){
 
                 //create container with given info
                 Container container_object(inputfile_x, inputfile_y, inputfile_weight, inputfile_name); 
-                //string name = trim(inputfile_name);
+                // string name = trim(inputfile_name);
                 // if(name == "UNUSED"){
                 //     Container container_object();
-                //     //container_object.free_spot = true;
+                //     container_object.free_spot = true;
                 // }
 
                 //put the container object into a vector<vector<Container>> shipNode
@@ -191,13 +191,11 @@ int main(){
     //cout << initial_node.default_ship_state[8][0] << endl;
 
 
-    //p.printContainersList(initial_node);
+   //p.printContainersList(initial_node);
     //calculate all weights for the ship
     p.calculateShipNode(initial_node);
 
     p.printCalculations(initial_node);
-
-    ShipNode& result = initial_node;
 
     if(p.balanceCheck(initial_node)){
         p.final_ship_state = initial_node;
@@ -205,10 +203,10 @@ int main(){
     else{
         cout << "Searching for Solution..." << endl;
         p.searchSolutionPath();
+        cout << "search algorithm ran!" << endl;
         p.calculateShipNode(p.final_ship_state);
         cout << "---Final Ship Node Calculations---" << endl;
         p.printCalculations(p.final_ship_state);
-        cout << "search algorithm ran!" << endl;
 
     }
 
@@ -244,7 +242,7 @@ int main(){
     }
 
     out << p.final_ship_state; 
-    //out << initial_node;
+    out << initial_node;
 
     out.close();
 

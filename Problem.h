@@ -51,7 +51,7 @@ struct Container{
     int final_y = initial_y;
 
     //free spot flag (empty space, UNUSED)
-    bool free_spot = false;
+    bool free_spot = true;
 
     //default Container object
     Container() : name("UNUSED"), weight(0), initial_x(0), initial_y(0), final_x(0), final_y(0), free_spot(true) {};
