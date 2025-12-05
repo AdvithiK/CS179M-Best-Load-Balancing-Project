@@ -217,18 +217,16 @@ vector<pair<int,int>> Problem::find_dest_list(const ShipNode& node, Container& b
     vector<pair<int,int>> dest_list;
     for(int j = 0; j < 12; j++) {
         for(int i = 8; i >= 0; i--) {
-            if (j == get_y_coord(node, box)){
+            if (j == get_x_coord(node, box)){
                 goto next_x;
             }
-            else if (trim(node.default_ship_state[i][j].name) == "UNUSED") {
+            if (trim(node.default_ship_state[i][j].name) == "UNUSED") {
                 pair<int,int> dest = {i,j};
                 dest_list.push_back(dest);
                 cout << "NEW DESTINATION ADDED: (" << dest.first << ", " << dest.second << ")" << endl;
                 goto next_x;
             }
-            else{
-                break;
-            }
+
         } 
         next_x:;      
     }
