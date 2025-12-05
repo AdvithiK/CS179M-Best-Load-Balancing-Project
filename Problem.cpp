@@ -371,7 +371,9 @@ void Problem::searchSolutionPath(){
                     cout << "ran through container is moveable" << endl;
                     ShipNode crane_moved_node = curr_node;
                     moveCranetoContainer(crane_moved_node, containers.at(c));
-                    exploreShipNodes(crane_moved_node, containers.at(c));
+                    unexplored_ship_states.push(crane_moved_node);
+                    //should not explore here because it'll reference initial node as parent, it should reference cr
+                    //exploreShipNodes(crane_moved_node, containers.at(c));
                 }
 
             }
