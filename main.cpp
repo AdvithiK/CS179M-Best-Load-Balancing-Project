@@ -242,7 +242,6 @@ int main(){
     }
 
     out << p.final_ship_state; 
-    out << initial_node;
 
     out.close();
 

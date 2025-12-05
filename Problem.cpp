@@ -75,30 +75,43 @@ void Problem::findContainers(const ShipNode& node){
 
 };
 
-void Problem::updateContainers(const ShipNode& node){
-    for(Container &box : containers){ 
-        for(int i = node.default_ship_state.size()-1; i >= 0; i--){
-            for(int j = 0; j < node.default_ship_state[i].size(); j++){
+// void Problem::updateContainers(const ShipNode& node){
+//     for(Container &box : containers){ 
+//         for(int i = node.default_ship_state.size()-1; i >= 0; i--){
+//             for(int j = 0; j < node.default_ship_state[i].size(); j++){
 
-                if(trim(node.default_ship_state[i][j].name) == trim(box.name)){
-                    //recomputing final_y and final_x
-                    box.final_y = node.default_ship_state.size() - i;
-                    box.final_x = j + 1;
-                    goto next_container;
-                }
-            }
+//                 if(trim(node.default_ship_state[i][j].name) == trim(box.name)){
+//                     //recomputing final_y and final_x
+//                     box.final_y = node.default_ship_state.size() - i;
+//                     box.final_x = j + 1;
+//                     goto next_container;
+//                 }
+//             }
+//         }
+//         next_container:;
+//     }
+// }
+
+void Problem::updatefinalSpots(ShipNode& node){
+    for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
+        for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
+            
+            node.default_ship_state[i][j].final_y = node.default_ship_state.size() - i;
+            node.default_ship_state[i][j].final_x = j + 1;
         }
-        next_container:;
     }
 }
+
 
 void Problem::printContainersList(ShipNode& node){
 
     for(int i = 0; i < containers.size(); i++){
         //testing for spacing
         //cout << "*" << containers.at(i).name << "\n";
-        int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
-        int index_coord_x = containers.at(i).final_x-1;
+        //int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
+        //int index_coord_x = containers.at(i).final_x-1;
+        int index_coord_y = get_y_coord(node, containers.at(i));
+        int index_coord_x = get_x_coord(node, containers.at(i));
         cout << containers.at(i) << endl;
         cout << "index: (" << index_coord_y << ", " << index_coord_x << ")" << endl;
     }
@@ -264,6 +277,7 @@ bool Problem::containerBelowCrane(const ShipNode& node, Container& box) {
 
 
 
+
 void Problem::updatefreeSpots(ShipNode& node){
     for (int i = node.default_ship_state.size() - 1; i >= 0; --i) { 
         for (int j = 0; j < node.default_ship_state[i].size(); ++j) { 
@@ -335,6 +349,17 @@ void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
     cout << "finished moving crane to container. crane is now at: " << "(" << get_y_coord(node, getCrane(node)) << ", " << get_x_coord(node, getCrane(node)) << "). name: "<<node.default_ship_state[container_y-1][container_x].name << endl;
 };
 
+void Problem::moveCranetoOrigin(ShipNode &node){
+    int crane_y = get_y_coord(node, getCrane(node));
+    int crane_x = get_x_coord(node, getCrane(node));
+
+    node.cost += (abs(crane_y+crane_x));
+
+    swap(node.default_ship_state[crane_y][crane_x], node.default_ship_state[0][0]);
+    cout << "finished moving crane to origin. crane is now at: " << "(" << get_y_coord(node, getCrane(node)) << ", " << get_x_coord(node, getCrane(node)) << "). name: "<<node.default_ship_state[0][0].name << endl;
+
+}
+
 //search algorithm here
 void Problem::searchSolutionPath(){
     cout << "in search solution path function" << endl;
@@ -359,6 +384,9 @@ void Problem::searchSolutionPath(){
             //calculateShipNode(curr_node);
             if(balCheck){
                 cout << "exploring function balance check made" << endl;
+                moveCranetoOrigin(final_ship_state);
+                //update the final coordinates for output
+                updatefinalSpots(final_ship_state);
                 goto dog;
             }
             

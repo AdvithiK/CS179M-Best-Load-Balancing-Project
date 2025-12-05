@@ -222,6 +222,8 @@ public:
 
     void updatefreeSpots(ShipNode& node);
 
+    void updatefinalSpots(ShipNode& node);
+
     bool craneCheck(const ShipNode& node, const Container& c);
 
     Container getCrane(const ShipNode& node);
@@ -229,6 +231,8 @@ public:
     bool checkUp(const ShipNode &node, const Container& box);
 
     void moveCranetoContainer(ShipNode &node, const Container& box);
+
+    void moveCranetoOrigin(ShipNode &node);
 
 
     //search algo function 
