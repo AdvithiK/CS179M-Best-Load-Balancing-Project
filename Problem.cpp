@@ -218,7 +218,9 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         cout << "container_x: " << container_x << endl;
 
         ShipNode new_node = node;
-        new_node.parent = &node;
+        //new_node.parent = &node;
+        //new_node.parent = &explored_ship_states.back();
+        new_node.parent = explored_ship_states.size()-1;
 
         cout << "NEW COST BEFORE MOVING CONTAINER: " << new_node.cost << endl;
 
@@ -389,14 +391,15 @@ void Problem::searchSolutionPath(){
     unexplored_ship_states.push(initial_ship_state);
     while(!unexplored_ship_states.empty() && !balCheck){
         
-        
         curr_node = unexplored_ship_states.top();
         cout << "COST FOR THE TOP OF THE QUEUE: " << curr_node.cost << endl; 
         unexplored_ship_states.pop();
+        explored_ship_states.push_back(curr_node);
         balanceCheck(curr_node);
         if(balCheck) {
                 cout << "TOP OF PRIORITY QUEUE iS BALANCED" << endl;
                 cout << curr_node << endl;
+                //explored_ship_states.push_back(final_ship_state);
                 moveCranetoOrigin(final_ship_state);
                 //update the final coordinates for output
                 updatefinalSpots(final_ship_state);
@@ -427,7 +430,9 @@ void Problem::searchSolutionPath(){
                 if(noboundaryUp && upspot_name == "UNUSED"){
                     cout << "ran through container is moveable" << endl;
                     ShipNode crane_moved_node = curr_node;
-                    crane_moved_node.parent = &curr_node;
+                    //crane_moved_node.parent = &curr_node;
+                    //crane_moved_node.parent = &explored_ship_states.back();
+                    crane_moved_node.parent = explored_ship_states.size()-1;
                     moveCranetoContainer(crane_moved_node, containers.at(c));
                     unexplored_ship_states.push(crane_moved_node);
                 }
@@ -446,26 +451,57 @@ void Problem::searchSolutionPath(){
 };
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-void Problem::traceSolutionPath(){
-    ShipNode* the_parent = &final_ship_state;
-    // solution_path.push(the_parent);
-    // the_parent = the_parent->parent;  
-    // if (the_parent == nullptr) cout << "YEHAHADHUIFHSDF" << endl;
-    // cout << the_parent << endl;
-    // solution_path.push(the_parent);
-    // the_parent = the_parent->parent;  
-    // solution_path.push(the_parent);
-    // the_parent = the_parent->parent;  
-    // solution_path.push(the_parent);
+// void Problem::traceSolutionPath(){
+//     ShipNode* the_parent = &final_ship_state;
+//     // solution_path.push(the_parent);
+//     // the_parent = the_parent->parent;  
+//     // if (the_parent == nullptr) cout << "YEHAHADHUIFHSDF" << endl;
+//     // cout << the_parent << endl;
+//     // solution_path.push(the_parent);
+//     // the_parent = the_parent->parent;  
+//     // solution_path.push(the_parent);
+//     // the_parent = the_parent->parent;  
+//     // solution_path.push(the_parent);
 
-    while (the_parent != nullptr) {
+//     while (the_parent != nullptr) {
         
-        solution_path.push(the_parent);
-        the_parent = the_parent->parent;  
-    }
+//         solution_path.push(the_parent);
+//         cout << the_parent->getCost() << endl;
+//         the_parent = the_parent->parent;  
+//     }
     
+//     cout << "solution_path.size(): " << solution_path.size() << endl;
+
+
+// };
+
+void Problem::traceSolutionPath(){
+
+    ShipNode temp = final_ship_state; 
+    solution_path.push(temp);
+    //add the final state before crane is moved back
+    solution_path.push(explored_ship_states.back());
+    //set temp to the next node
+    //int i=0;
+    while (!(temp == initial_ship_state))
+    {
+        cout << "node" << endl;
+        temp = explored_ship_states.at(temp.parent);
+        updatefinalSpots(temp);
+        solution_path.push(temp);
+        //i++;
+    }
+    //solution_path.push(explored_ship_states.back());
+    //cout << "why" << endl;
+
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
+    //print out the solution path
+    while (!solution_path.empty())
+    {
+        cout << solution_path.top() << endl;
+        solution_path.pop();
+    }
 
 
 };

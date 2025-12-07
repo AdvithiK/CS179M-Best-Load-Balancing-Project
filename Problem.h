@@ -106,7 +106,10 @@ struct ShipNode{
     // vector<Container> containers;
     
     //highkey don't remember much on pointers. isabelleeeeee helpppp plzzzz
-    ShipNode* parent;
+    //ShipNode* parent;
+
+    //storing the index of a parent
+    int parent;
 
 
     //total weight on the ship node
@@ -133,6 +136,8 @@ struct ShipNode{
         return (cost+heuristic) > (rhs.cost + rhs.heuristic);
     }
 
+    int getCost() const { return cost; }
+
     //assignment operator to make a copy of a ShipNode
     ShipNode &operator=(const ShipNode& rhs){
         
@@ -156,7 +161,8 @@ struct ShipNode{
 
         heuristic = rhs.heuristic;
 
-        parent = nullptr;
+        //parent = nullptr;
+        parent = rhs.parent;
 
         return *this;
 
@@ -167,7 +173,7 @@ struct ShipNode{
         bool twinsies = true;
         for (int i = default_ship_state.size() - 1; i >= 0; i--) { 
             for (int j = 0; j < default_ship_state[i].size(); j++) { 
-                if(default_ship_state[i][j] != rhs.default_ship_state[i][j]){
+                if(default_ship_state[i][j].name != rhs.default_ship_state[i][j].name){
                     twinsies = false;
                 }
             }
@@ -178,10 +184,11 @@ struct ShipNode{
 
 
 
+
     //if we make parent a pointer, change it here (currently set to -> this, should it be nullptr?)
     //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
-    ShipNode(): default_ship_state(vector<vector<Container>>(9, vector<Container>(12))), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
-    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(9, vector<Container>(12))), parent(0), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(0), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
 
 
 
@@ -209,7 +216,8 @@ public:
     vector<ShipNode> explored_ship_states;
 
     //stores the order of each step to the final solution state
-    stack<ShipNode*> solution_path;
+    //stack<ShipNode*> solution_path;
+    stack<ShipNode> solution_path;
 
     bool balCheck = false;
 
