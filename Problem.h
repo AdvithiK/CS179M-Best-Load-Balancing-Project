@@ -12,6 +12,10 @@
 #include "UI/json.hpp"
 #include <fstream>
 #include <utility>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 using json = nlohmann::json;
 
@@ -234,7 +238,7 @@ public:
 
     void moveCranetoOrigin(ShipNode &node);
 
-    void algo(ShipNode&node);
+    void algo(ShipNode&node, ofstream& log_file, string filename);
 
 
     //search algo function 

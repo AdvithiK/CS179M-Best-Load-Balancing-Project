@@ -1,6 +1,7 @@
 #include "Problem.h"
 #include <iostream>
 
+
 using namespace std;
 
 ostream &operator<<(ostream &output, const ShipNode &node){
@@ -9,7 +10,6 @@ ostream &operator<<(ostream &output, const ShipNode &node){
         for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
             output << node.default_ship_state[i][j] << "\n"; 
         }
-        output << "\n";
     }
     return output;
 }
@@ -447,11 +447,25 @@ void Problem::searchSolutionPath(){
 void Problem::traceSolutionPath(ShipNode& node){};
 
 
-void Problem::algo(ShipNode& node) {
-    // populate the containers list
+void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
+
+    time_t now = time(0);
+    tm *local = localtime(&now);
+    string verb = "are ";
+
     findContainers(node);
-    printContainersList(node);
-    searchSolutionPath();
-    cout << final_ship_state << endl;
+    if (containers.size() == 1) verb = "is ";
+
+    log_file << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << " Manifest " << filename << " is opened, there " << verb 
+        << containers.size() << " container(s) on the ship." << endl;
+
+    // searchSolutionPath();
+   
+
 
 }

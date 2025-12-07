@@ -10,8 +10,8 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib> 
-#include <chrono>
 #include <thread>
+
 
 #include "Problem.h"
 
@@ -28,6 +28,36 @@ using namespace std::chrono;
 
 
 int main(){
+
+    string log_file;
+  
+    time_t now = time(nullptr);
+    tm *local = localtime(&now);
+
+    ostringstream oss;
+    oss << "KeoughsPort"
+        << (local->tm_mon + 1) << "_"
+        << local->tm_mday << "_"
+        << (local->tm_year + 1900) << "_"
+        << setw(2) << setfill('0') << local->tm_hour
+        << setw(2) << setfill('0') << local->tm_min
+        << ".txt";
+
+    log_file = oss.str();
+
+    ofstream log(log_file);
+    if (!log.is_open()) {
+        cout << "Could not open output file: " << log_file+".txt" << endl;
+    }
+
+    // // write: 10 18 2023: 01:14 Program was started.
+    log << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << " Program was started." << endl;
+ 
 
     //2D array 
 
@@ -53,15 +83,15 @@ int main(){
     //filename = input_file;
 
     //open the file + error handling if file can't open
-    ifstream file(input_file);
+    ifstream file(input_file+".txt");
 
     if(!file.is_open()){
         cout << "Errors occured when opening the file: \"" << input_file << endl;
         
         //second attempt to get correct file name
-        cout << "Enter the correct file name. Make sure it has '.txt' at the end." << endl;
+        cout << "Enter the correct file name." << endl;
         cin >> input_file;
-        file.open(input_file);
+        file.open(input_file+".txt");
 
         if(!file.is_open()){
             cout << "Second attempt to open file failed. Exiting program." << endl;
@@ -94,74 +124,7 @@ int main(){
     
     */
 
-    //populate 2D array to reflect the file's content (96 cells, 8 x 12 object)
-    
-    //get each row from file to populate each Container object
-    
 
-    //feed in the values for container object
-
-
-    //get a validation check for 8 rows in here later !! -> ur welcome isabelle <3
-
-    //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
-
-    // for(int i = 8; i >= 0; i--){
-    //     //there should be 12 objects in every tempVec, then tempVect should get reset
-    //     //vector<Container> tempVec;
-        
-    //     for(int j = 0; j < 12; j++){
-
-    //         if(i==0){
-
-    //             if(j==0){
-    //                 Container crane_object(j, i, 0, "CRANE"); 
-    //                 initial_ship_state[i][j] = crane_object;
-                    
-    //             }
-    //             else{
-    //                 Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
-    //                 initial_ship_state[i][j] = unused_object;   
-    //                 cout << "Unused at " << i << " " << j << endl;
-
-    //             }
-    //         }
-    //         else{
-
-    //             //validation check needed here !!
-    //             // function made to read in each line of the file
-    //             //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
-    //                     //feed in the [] , {} into this char
-    //             char discard_element;
-                
-    //             //take in the [y,x],
-    //             file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
-
-    //             //take in the {weight}
-    //             file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
-                
-    //             //take in the NAME (getline b/c it can have spaces)
-    //             getline(file, inputfile_name);
-
-    //             //create container with given info
-    //             Container container_object(inputfile_x, inputfile_y, inputfile_weight, inputfile_name);
-    //             cout << inputfile_weight << " at " << i << " " << j << endl; 
-    //             // string name = trim(inputfile_name);
-    //             // if(name == "UNUSED"){
-    //             //     Container container_object();
-    //             //     container_object.free_spot = true;
-    //             // }
-
-    //             //put the container object into a vector<vector<Container>> shipNode
-    //             //tempVec.push_back(container_object);
-    //             initial_ship_state[i][j] = container_object;
-    //         }
-    //     }
-    //     //append each tempVec to the 2D vector 
-    //     //initial_ship_state.push_back(tempVec);
-    // }
-
-    
     string filerow;
     string container_name;
     int inputfile_y;
@@ -211,81 +174,21 @@ int main(){
     //ShipNode small_initial_node(small_ship_state);
     Problem p(initial_node);
 
+    string output_file;
+    output_file = input_file+"OUTBOUND"+".txt";
+
+    ofstream out(output_file);
+    if (!out.is_open()) {
+        cout << "Could not open output file: " << output_file+".txt" << endl;
+        return 1;
+    }
+
     // run the algorithm
-    p.algo(initial_node);
+    p.algo(initial_node, log, input_file+".txt");
+    out << p.final_ship_state; 
 
-    // p.findContainers(initial_node);
-    // p.printContainersList(initial_node);
-    // p.printCalculations(initial_node);
-
-    //cout << initial_node.default_ship_state[8][0] << endl;
-
-
-   //p.printContainersList(initial_node);
-    //calculate all weights for the ship
-
-
-    // WAAAAAAAAA
-    // p.calculateShipNode(initial_node);
-
-    // p.printCalculations(initial_node);
-
-    // if(p.balanceCheck(initial_node)){
-    //     p.final_ship_state = initial_node;
-    // }
-    // else{
-    //     cout << "Searching for Solution..." << endl;
-    //     p.searchSolutionPath();
-    //     cout << "search algorithm ran!" << endl;
-    //     p.calculateShipNode(p.final_ship_state);
-    //     cout << "---Final Ship Node Calculations---" << endl;
-    //     p.printCalculations(p.final_ship_state);
-
-    // }
-    // WAAAAAAAAA
-
-    // cout << "-----------------result node: right-------------------" << endl;
-    // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
-    // cout << result.default_ship_state[1][0] << " | " << result.default_ship_state[1][1] << endl;
-    
-    /* END OF TESTING THE MOVEMENT OPERATIONS */
-    
-
-    // WAAAAAA
-    // cout << "Solution Found! Solution is written to output.txt" << endl;
-     // WAAAAAA
-
-
-
-    // if(p.balanceCheck(initial_node)){
-    //     result = initial_node;
-    // }
-    // else{
-    //     cout << "NOT BALANCED";
-    // } 
-
-  
-    //cout << "Solution Found! Solution is written to output.txt" << endl;
-    //p.printCalculations(result);
-
-
-
-    /// WAAAAAAA
-
-    // string output_file;
-    // output_file = "output.txt";
-
-    // ofstream out(output_file);
-    // if (!out.is_open()) {
-    //     cout << "Could not open output file: " << output_file << endl;
-    //     return 1;
-    // }
-
-    // out << p.final_ship_state; 
-
-    // out.close();
-
-    // WAAAAAAA
+    out.close();
+    log.close();
 
     
     return 0; 
