@@ -58,7 +58,6 @@ int get_x_coord(const ShipNode& node, const Container& box){
 
 void Problem::findContainers(const ShipNode& node){
     //loop thru the 2D array and find all Containers, append them to the list (copy for now, prob can be done with pointers)
-    
     for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
         for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
             string name = trim(node.default_ship_state[i][j].name);
@@ -93,23 +92,27 @@ void Problem::findContainers(const ShipNode& node){
 // }
 
 void Problem::updatefinalSpots(ShipNode& node){
-    for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
+
+    // 9
+    for (int i = 0; i < node.default_ship_state.size(); i++) { 
+        //12
         for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
-            
-            node.default_ship_state[i][j].final_y = node.default_ship_state.size() - i;
-            node.default_ship_state[i][j].final_x = j + 1;
+            node.default_ship_state[i][j].initial_y = j;
+            node.default_ship_state[i][j].initial_x = i;
         }
     }
+
 }
 
 
 void Problem::printContainersList(ShipNode& node){
-
+    cout << "---------- Containers Printing ----------" << endl;
     for(int i = 0; i < containers.size(); i++){
         //testing for spacing
         //cout << "*" << containers.at(i).name << "\n";
         //int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
         //int index_coord_x = containers.at(i).final_x-1;
+        cout << endl;
         int index_coord_y = get_y_coord(node, containers.at(i));
         int index_coord_x = get_x_coord(node, containers.at(i));
         cout << containers.at(i) << endl;
@@ -126,13 +129,11 @@ void Problem::calculateShipNode(ShipNode& node){
     //NOTE: cost should be calculated in search
     node.p_side_weight = 0;
     node.s_side_weight = 0;
-
-    //set the p_side & s_side weights
+     //set the p_side & s_side weights
     for(int i = 0; i < containers.size(); i++){
         //checks to see if it should be on p_side (x coord is 1-6 (0-5 index)) or s_side (x coord is 7-12 (6-11 index))
-        
         int half_ship = (node.default_ship_state[0].size()/2);
-        if(get_x_coord(node, containers.at(i)) <= half_ship ){
+        if(get_x_coord(node, containers.at(i)) < half_ship ){
             node.p_side_weight += containers.at(i).weight;
         }
         else{
@@ -142,6 +143,7 @@ void Problem::calculateShipNode(ShipNode& node){
 
     //set the total weight on the ship
     node.sum_weight = node.p_side_weight + node.s_side_weight;
+    cout << node.sum_weight << endl;
 
     //calculate the heuristic
     node.heuristic = abs(node.p_side_weight - node.s_side_weight) - (node.sum_weight*0.10);
@@ -156,55 +158,71 @@ void Problem::printCalculations(ShipNode& node){
     cout << "The difference between port side and sea side weight on this ship is: " << abs(node.p_side_weight - node.s_side_weight) << endl;
     cout << "The max overweight factor is: " << (node.sum_weight*0.10) << endl;
     cout << "This ship is: ";
-    if(balanceCheck(node)){
-        cout << "BALANCED";
-    }
-    else{
-        cout << "NOT BALANCED";
-    }
+    if (balCheck) cout << "BALANCED"; 
+    else cout << "NOT BALANCED";
     cout << endl;
     cout << "The cost (depth) of the ship is: " << node.cost << endl;
     cout << "The heuristic of the ship is: "<< node.heuristic << endl;
     
 }
 
-bool Problem::balanceCheck(ShipNode& node){
-    bool truth = false;
+void Problem::balanceCheck(ShipNode& node){
     bool no_zero_s_side = (node.p_side_weight >= node.s_side_weight) && node.s_side_weight != 0;
     bool no_zero_p_side = (node.s_side_weight >= node.p_side_weight) && node.p_side_weight!= 0;
     if(containers.size()<=1){
         cout << "passed thru container size bal check" << endl;
-        truth = true;
+        balCheck = true;
+        
     }
     else if(containers.size() == 2 && no_zero_s_side || no_zero_p_side){
             cout << "pass thru 2 container condition bal check" << endl;
-            truth = true;
+            balCheck = true;
     }
     else if(abs(node.p_side_weight - node.s_side_weight) <= (node.sum_weight*0.10)){
         cout << "passed thru formula bal check" << endl;
         cout << "port side weight:" << node.p_side_weight << " sea side weight: " << node.s_side_weight << endl; 
-        truth = true;
+        balCheck = true;
     }
-    return truth;
+
+    if (balCheck) {
+        final_ship_state = node;
+        cout << "BALANCED according to balance check" << endl;
+    }
+    else cout << "UNBALANCED according to balance check" << endl;
+
+    
+
+
 }
 
 
 
 
 void Problem::exploreShipNodes(ShipNode& node, Container& box){
-    cout << "exploring possible nodes" << endl;
+    cout << "---------------- EXPLORE FUNCTION: ----------------" << endl;
     vector<pair<int, int>> dest_list = find_dest_list(node, box);
     cout << "exploring " << dest_list.size() <<" nodes" << endl;
     for (const auto& p : dest_list) {
         int index_y = p.first;
         int index_x = p.second;
 
+        cout << "Index_y: " << index_y << endl;
+        cout << "Index_x: " << index_x << endl;
+
+        // if (index_x == 8) break;
+
         int container_y = get_y_coord(node, box);
         int container_x = get_x_coord(node, box);
 
+        cout << "container_y: " << container_y << endl;
+        cout << "container_x: " << container_x << endl;
+
         ShipNode new_node = node;
 
-        new_node.cost += abs(container_y-index_y) - abs(container_x - index_x);
+        cout << "NEW COST BEFORE MOVING CONTAINER: " << new_node.cost << endl;
+
+        new_node.cost += abs(container_y-index_y) + abs(container_x - index_x);
+        cout << "NEW COST AFTER MOVING CONTAINER: " << new_node.cost << endl;
 
         swap(new_node.default_ship_state[container_y][container_x], new_node.default_ship_state[index_y][index_x]);
 
@@ -215,15 +233,11 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         swap(new_node.default_ship_state[crane_y][crane_x], new_node.default_ship_state[index_y-1][index_x]);
 
         calculateShipNode(new_node);
-        cout << "port side weight:" << node.p_side_weight << " sea side weight: " << node.s_side_weight << endl; 
-        if(balanceCheck(new_node)){
-            cout << "exploring function balance check made" << endl;
-            final_ship_state = new_node;
-            balCheck = true;
-        }
-        
+        cout << "PORT side weight:" << new_node.p_side_weight << " STARBOARD weight: " << new_node.s_side_weight << endl; 
+    
         //append to unexplored
         unexplored_ship_states.push(new_node);
+        cout << "___________________________________________\n" << endl;
 
     }
 
@@ -233,7 +247,8 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
 vector<pair<int,int>> Problem::find_dest_list(const ShipNode& node, Container& box) {
     vector<pair<int,int>> dest_list;
     for(int j = 0; j < 12; j++) {
-        for(int i = 8; i >= 0; i--) {
+        for(int i = 8; i > 0; i--) {
+            // skip the crane column
             if (j == get_x_coord(node, box)){
                 goto next_x;
             }
@@ -343,10 +358,13 @@ void Problem::moveCranetoContainer(ShipNode &node, const Container& box){
     int crane_y = get_y_coord(node, getCrane(node));
     int crane_x = get_x_coord(node, getCrane(node));
 
+    cout << "COST BEFORE MOVING CRANE: " << node.cost << endl;
     node.cost += (abs(container_y-crane_y) + abs(container_x-crane_x))-1;
+    cout << "COST AFTER MOVING CRANE: " << node.cost << endl;
+
 
     swap(node.default_ship_state[crane_y][crane_x], node.default_ship_state[container_y-1][container_x]);
-    cout << "finished moving crane to container. crane is now at: " << "(" << get_y_coord(node, getCrane(node)) << ", " << get_x_coord(node, getCrane(node)) << "). name: "<<node.default_ship_state[container_y-1][container_x].name << endl;
+    cout << "MOVED CRANE TO CONTAINER. Crane is now at: " << "(" << get_y_coord(node, getCrane(node)) << ", " << get_x_coord(node, getCrane(node)) << "). name: "<<node.default_ship_state[container_y-1][container_x].name << endl;
 };
 
 void Problem::moveCranetoOrigin(ShipNode &node){
@@ -362,37 +380,42 @@ void Problem::moveCranetoOrigin(ShipNode &node){
 
 //search algorithm here
 void Problem::searchSolutionPath(){
-    cout << "in search solution path function" << endl;
+    calculateShipNode(initial_ship_state);
+    cout << initial_ship_state.p_side_weight << " " << initial_ship_state.s_side_weight << endl;
+    cout << endl;
+    cout << "-------------------- SEARCH SOLUTION PATH FUNCTION --------------------" << endl;
     ShipNode curr_node;
     unexplored_ship_states.push(initial_ship_state);
-    cout << "size of unexplored ship states" << endl;
     while(!unexplored_ship_states.empty() && !balCheck){
-        cout << "in while loop" << endl;
-        cout << "unexplored size: " << unexplored_ship_states.size() << endl;
+        
+        
         curr_node = unexplored_ship_states.top();
-        cout << "current node being explored: " << curr_node << endl;
+        cout << "COST FOR THE TOP OF THE QUEUE: " << curr_node.cost << endl; 
         unexplored_ship_states.pop();
+        balanceCheck(curr_node);
+        if(balCheck) {
+                cout << "TOP OF PRIORITY QUEUE iS BALANCED" << endl;
+                cout << curr_node << endl;
+                moveCranetoOrigin(final_ship_state);
+                //update the final coordinates for output
+                updatefinalSpots(final_ship_state);
+                goto exit;
+        } 
+
+        // seending each movement to queue
         for (int c = 0; c < containers.size(); c++){
-            cout << "in for loop for container:" << containers.at(c) << endl;
             int index_coord_y = get_y_coord(curr_node, containers.at(c));
             int index_coord_x = get_x_coord(curr_node, containers.at(c));
+            cout << "Container Indexes [y,x]: " << index_coord_y << " " << index_coord_x << endl;
             //ensuring container is not going out of bounds
             bool noboundaryUp = index_coord_y > 0;
             //grabbing name of spot above container
             string upspot_name = trim(curr_node.default_ship_state[index_coord_y-1][index_coord_x].name);
             
-            //calculateShipNode(curr_node);
-            if(balCheck){
-                cout << "exploring function balance check made" << endl;
-                moveCranetoOrigin(final_ship_state);
-                //update the final coordinates for output
-                updatefinalSpots(final_ship_state);
-                goto dog;
-            }
-            
-            //if crane is above c
+            //if crane is above container
             if(craneCheck(curr_node, containers.at(c))){
                 cout << "ran through craneCheck" << endl;
+                
                 exploreShipNodes(curr_node, containers.at(c));
 
             }
@@ -405,17 +428,16 @@ void Problem::searchSolutionPath(){
                     ShipNode crane_moved_node = curr_node;
                     moveCranetoContainer(crane_moved_node, containers.at(c));
                     unexplored_ship_states.push(crane_moved_node);
-                    //should not explore here because it'll reference initial node as parent, it should reference cr
-                    //exploreShipNodes(crane_moved_node, containers.at(c));
                 }
 
             }
-            cout << "done with 1 run of for loop" << endl;
         } 
         
     }
-    dog:;
-    cout << "finished search" << endl;
+    exit:;
+    cout << endl;
+    cout << "----------------- SEARCH COMPLETE -----------------" << endl;
+    printCalculations(final_ship_state);
 
 
     
@@ -423,3 +445,13 @@ void Problem::searchSolutionPath(){
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
 void Problem::traceSolutionPath(ShipNode& node){};
+
+
+void Problem::algo(ShipNode& node) {
+    // populate the containers list
+    findContainers(node);
+    printContainersList(node);
+    searchSolutionPath();
+    cout << final_ship_state << endl;
+
+}

@@ -65,7 +65,7 @@ struct Container{
         //saving the format of the current output 
         ios oldState(nullptr);
         oldState.copyfmt(out);
-        out << "[" << setw(2) << setfill('0') << box.final_y << "," << setw(2) << setfill('0') << box.final_x << "]" << ", " 
+        out << "[" << setw(2) << setfill('0') << 9 - box.initial_x << "," << setw(2) << setfill('0') << box.initial_y+1 << "]" << ", " 
         << "{" << setw(5) << setfill('0') << box.weight << "}" << ", " << box.name;
         //restoring the format of the current output 
         out.copyfmt(oldState);
@@ -234,6 +234,8 @@ public:
 
     void moveCranetoOrigin(ShipNode &node);
 
+    void algo(ShipNode&node);
+
 
     //search algo function 
     void searchSolutionPath();
@@ -259,7 +261,8 @@ public:
 
     //checks the balance of the ship
     //DONE
-    bool balanceCheck(ShipNode& node);
+    void balanceCheck(ShipNode& node);
+
 
 
     void setUI(const ShipNode &node);

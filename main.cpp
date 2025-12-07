@@ -33,6 +33,7 @@ int main(){
 
     //when populating the vector, we need to make sure its [8][12] strict (9 x 12 for air)
     //Container ship[8][12];
+    // 9 rows 12 columns, max 9 x and max 12 y
     vector<vector<Container>> initial_ship_state(9, vector<Container>(12));
 
 
@@ -68,7 +69,6 @@ int main(){
         }
     }
 
-    //validate the file is open
 
     //check if file is empty. If it is, exit program
     if (file.peek() == ifstream::traits_type::eof()) {
@@ -97,118 +97,152 @@ int main(){
     //populate 2D array to reflect the file's content (96 cells, 8 x 12 object)
     
     //get each row from file to populate each Container object
-    string filerow;
-
-
+    
 
     //feed in the values for container object
-    int inputfile_y;
-    int inputfile_x;
-    int inputfile_weight;
-    string inputfile_name;
+
 
     //get a validation check for 8 rows in here later !! -> ur welcome isabelle <3
 
     //ISSUE WITH PRINTING, needs to be fixed so I can validate the data (containers) in each ShipNode object is right
 
-    for(int i = 8; i >= 0; i--){
-        //there should be 12 objects in every tempVec, then tempVect should get reset
-        //vector<Container> tempVec;
+    // for(int i = 8; i >= 0; i--){
+    //     //there should be 12 objects in every tempVec, then tempVect should get reset
+    //     //vector<Container> tempVec;
         
-        for(int j = 0; j < 12; j++){
+    //     for(int j = 0; j < 12; j++){
 
-            if(i==0){
-                if(j==0){
-                    Container crane_object(j, i, 0, "CRANE"); 
+    //         if(i==0){
 
-                    initial_ship_state[i][j] = crane_object;
-                }
-                else{
-                    Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
-                    unused_object.free_spot = true;
-                    initial_ship_state[i][j] = unused_object;
-                }
-            }
-            else{
+    //             if(j==0){
+    //                 Container crane_object(j, i, 0, "CRANE"); 
+    //                 initial_ship_state[i][j] = crane_object;
+                    
+    //             }
+    //             else{
+    //                 Container unused_object(j+1, initial_ship_state.size(), 0, "UNUSED"); 
+    //                 initial_ship_state[i][j] = unused_object;   
+    //                 cout << "Unused at " << i << " " << j << endl;
 
-                //validation check needed here !!
-                // function made to read in each line of the file
-                //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
-                        //feed in the [] , {} into this char
-                char discard_element;
+    //             }
+    //         }
+    //         else{
+
+    //             //validation check needed here !!
+    //             // function made to read in each line of the file
+    //             //readInFile(file, inputfile_y, inputfile_x, inputfile_weight, inputfile_name);
+    //                     //feed in the [] , {} into this char
+    //             char discard_element;
                 
+    //             //take in the [y,x],
+    //             file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
 
-                //take in the [y,x],
-                file >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
-
-                //take in the {weight}
-                file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
+    //             //take in the {weight}
+    //             file >> discard_element >> inputfile_weight >> discard_element >> discard_element;
                 
-                //take in the NAME (getline b/c it can have spaces)
-                getline(file, inputfile_name);
+    //             //take in the NAME (getline b/c it can have spaces)
+    //             getline(file, inputfile_name);
 
-                //create container with given info
-                Container container_object(inputfile_x, inputfile_y, inputfile_weight, inputfile_name); 
-                // string name = trim(inputfile_name);
-                // if(name == "UNUSED"){
-                //     Container container_object();
-                //     container_object.free_spot = true;
-                // }
+    //             //create container with given info
+    //             Container container_object(inputfile_x, inputfile_y, inputfile_weight, inputfile_name);
+    //             cout << inputfile_weight << " at " << i << " " << j << endl; 
+    //             // string name = trim(inputfile_name);
+    //             // if(name == "UNUSED"){
+    //             //     Container container_object();
+    //             //     container_object.free_spot = true;
+    //             // }
 
-                //put the container object into a vector<vector<Container>> shipNode
-                //tempVec.push_back(container_object);
-                initial_ship_state[i][j] = container_object;
-            }
-        }
-        //append each tempVec to the 2D vector 
-        //initial_ship_state.push_back(tempVec);
+    //             //put the container object into a vector<vector<Container>> shipNode
+    //             //tempVec.push_back(container_object);
+    //             initial_ship_state[i][j] = container_object;
+    //         }
+    //     }
+    //     //append each tempVec to the 2D vector 
+    //     //initial_ship_state.push_back(tempVec);
+    // }
+
+    
+    string filerow;
+    string container_name;
+    int inputfile_y;
+    int inputfile_x;
+    int inputfile_weight;
+    string inputfile_name;
+    while (getline(file, filerow)) {
+        char discard_element;
+        stringstream ss(filerow);
+
+        ss >> discard_element >> inputfile_y >> discard_element >> inputfile_x >> discard_element >> discard_element;
+        ss >> discard_element >> inputfile_weight >> discard_element >> discard_element;
+        
+        getline(ss, container_name);   
+        
+        // cout << "[" << inputfile_y << "," << inputfile_x << "], {" << inputfile_weight << "} " << container_name << endl;
+        // [x,y]:[1,1] is actually [8,0]
+        // row is y and col is x
+        int row = inputfile_x-1;
+        int col = 9 - inputfile_y;
+
+        // cout << "[row,col]:" << "[" << row << "," << col << "]" << endl;
+
+        Container object(col, row, inputfile_weight, container_name ); 
+        initial_ship_state[col][row] = object; 
+
     }
 
-
-
+    // adding the crane
+    Container object(0, 0, 0, "CRANE"); 
+    initial_ship_state[0][0] = object; 
 
     //close the file
     file.close();
 
 
     // start up the server & open it up
-    system("python3 -m http.server 13000 &");
-    system("open http://localhost:13000/UI/index.html");
+    // system("python3 -m http.server 13000 &");
+    // system("open http://localhost:13000/UI/index.html");
     // use this for checking if it does the auto update (can remove later)
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
 
 
     //turn the 2D vector object into a Ship Node, and start the algooo
     ShipNode initial_node(initial_ship_state);
+
     //ShipNode small_initial_node(small_ship_state);
     Problem p(initial_node);
-    p.updatefreeSpots(initial_node);
 
-    //find all the containers in the initial ship
-    p.findContainers(initial_node);
+    // run the algorithm
+    p.algo(initial_node);
+
+    // p.findContainers(initial_node);
+    // p.printContainersList(initial_node);
+    // p.printCalculations(initial_node);
 
     //cout << initial_node.default_ship_state[8][0] << endl;
 
 
    //p.printContainersList(initial_node);
     //calculate all weights for the ship
-    p.calculateShipNode(initial_node);
 
-    p.printCalculations(initial_node);
 
-    if(p.balanceCheck(initial_node)){
-        p.final_ship_state = initial_node;
-    }
-    else{
-        cout << "Searching for Solution..." << endl;
-        p.searchSolutionPath();
-        cout << "search algorithm ran!" << endl;
-        p.calculateShipNode(p.final_ship_state);
-        cout << "---Final Ship Node Calculations---" << endl;
-        p.printCalculations(p.final_ship_state);
+    // WAAAAAAAAA
+    // p.calculateShipNode(initial_node);
 
-    }
+    // p.printCalculations(initial_node);
+
+    // if(p.balanceCheck(initial_node)){
+    //     p.final_ship_state = initial_node;
+    // }
+    // else{
+    //     cout << "Searching for Solution..." << endl;
+    //     p.searchSolutionPath();
+    //     cout << "search algorithm ran!" << endl;
+    //     p.calculateShipNode(p.final_ship_state);
+    //     cout << "---Final Ship Node Calculations---" << endl;
+    //     p.printCalculations(p.final_ship_state);
+
+    // }
+    // WAAAAAAAAA
 
     // cout << "-----------------result node: right-------------------" << endl;
     // cout << result.default_ship_state[0][0]<< " | " << result.default_ship_state[0][1] << endl;
@@ -216,8 +250,10 @@ int main(){
     
     /* END OF TESTING THE MOVEMENT OPERATIONS */
     
-    cout << "Solution Found! Solution is written to output.txt" << endl;
-    
+
+    // WAAAAAA
+    // cout << "Solution Found! Solution is written to output.txt" << endl;
+     // WAAAAAA
 
 
 
@@ -232,20 +268,24 @@ int main(){
     //cout << "Solution Found! Solution is written to output.txt" << endl;
     //p.printCalculations(result);
 
-    string output_file;
-    output_file = "output.txt";
-
-    ofstream out(output_file);
-    if (!out.is_open()) {
-        cout << "Could not open output file: " << output_file << endl;
-        return 1;
-    }
-
-    out << p.final_ship_state; 
-
-    out.close();
 
 
+    /// WAAAAAAA
+
+    // string output_file;
+    // output_file = "output.txt";
+
+    // ofstream out(output_file);
+    // if (!out.is_open()) {
+    //     cout << "Could not open output file: " << output_file << endl;
+    //     return 1;
+    // }
+
+    // out << p.final_ship_state; 
+
+    // out.close();
+
+    // WAAAAAAA
 
     
     return 0; 
