@@ -218,6 +218,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         cout << "container_x: " << container_x << endl;
 
         ShipNode new_node = node;
+        new_node.parent = &node;
 
         cout << "NEW COST BEFORE MOVING CONTAINER: " << new_node.cost << endl;
 
@@ -426,6 +427,7 @@ void Problem::searchSolutionPath(){
                 if(noboundaryUp && upspot_name == "UNUSED"){
                     cout << "ran through container is moveable" << endl;
                     ShipNode crane_moved_node = curr_node;
+                    crane_moved_node.parent = &curr_node;
                     moveCranetoContainer(crane_moved_node, containers.at(c));
                     unexplored_ship_states.push(crane_moved_node);
                 }
@@ -444,7 +446,29 @@ void Problem::searchSolutionPath(){
 };
 
 //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-void Problem::traceSolutionPath(ShipNode& node){};
+void Problem::traceSolutionPath(){
+    ShipNode* the_parent = &final_ship_state;
+    // solution_path.push(the_parent);
+    // the_parent = the_parent->parent;  
+    // if (the_parent == nullptr) cout << "YEHAHADHUIFHSDF" << endl;
+    // cout << the_parent << endl;
+    // solution_path.push(the_parent);
+    // the_parent = the_parent->parent;  
+    // solution_path.push(the_parent);
+    // the_parent = the_parent->parent;  
+    // solution_path.push(the_parent);
+
+    while (the_parent != nullptr) {
+        
+        solution_path.push(the_parent);
+        the_parent = the_parent->parent;  
+    }
+    
+    cout << "solution_path.size(): " << solution_path.size() << endl;
+
+
+
+};
 
 
 void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
@@ -464,8 +488,20 @@ void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
         << " Manifest " << filename << " is opened, there " << verb 
         << containers.size() << " container(s) on the ship." << endl;
 
-    // searchSolutionPath();
+    searchSolutionPath();
+    traceSolutionPath();
    
 
+}
 
+void Problem::alterLog(ofstream& log_file, string comment) {
+    time_t now = time(0);
+    tm *local = localtime(&now);
+
+    log_file << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << comment << endl;
 }

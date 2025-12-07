@@ -146,8 +146,6 @@ struct ShipNode{
         }
         
 
-        //containers = rhs.containers;
-
         sum_weight = rhs.sum_weight;
         
         p_side_weight = rhs.p_side_weight;
@@ -158,8 +156,7 @@ struct ShipNode{
 
         heuristic = rhs.heuristic;
 
-        //idk about this...
-        parent = rhs.parent;
+        parent = nullptr;
 
         return *this;
 
@@ -212,7 +209,7 @@ public:
     vector<ShipNode> explored_ship_states;
 
     //stores the order of each step to the final solution state
-    stack<ShipNode> solution_path;
+    stack<ShipNode*> solution_path;
 
     bool balCheck = false;
 
@@ -253,7 +250,7 @@ public:
     void exploreShipNodes(ShipNode& node, Container& box);
 
     //once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-    void traceSolutionPath(ShipNode& node);
+    void traceSolutionPath();
 
     //checker to see if containers was populated
     //DONE
@@ -268,10 +265,9 @@ public:
     void balanceCheck(ShipNode& node);
 
 
-
     void setUI(const ShipNode &node);
 
-    void alterLog(string comment);
+    void alterLog(ofstream&, string comment);
 
     vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);
 
