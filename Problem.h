@@ -129,7 +129,7 @@ struct ShipNode{
     //measured via distance from minimum viable balancing different
     int heuristic;
 
-    Container moving_container = Container();
+    Container moving_container;
 
     //overload operators for ShipNode 
 
@@ -166,6 +166,8 @@ struct ShipNode{
 
         //parent = nullptr;
         parent = rhs.parent;
+
+        moving_container = rhs.moving_container;
 
         return *this;
 
@@ -227,6 +229,8 @@ public:
     //stores the order of each step to the final solution state
     //stack<ShipNode*> solution_path;
     stack<ShipNode> solution_path;
+
+    vector<ShipNode> solution_path_vec;
 
     bool balCheck = false;
 

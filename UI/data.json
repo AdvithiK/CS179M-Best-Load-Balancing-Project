@@ -1,12 +1,32 @@
 [
     {
-        "name": " Fish for Wendys\r",
+        "name": " Pig\r",
         "x": 6,
         "y": 8
     },
     {
-        "name": " Bikes\r",
+        "name": " Owl  \r",
+        "x": 2,
+        "y": 8
+    },
+    {
+        "name": " Ewe\r",
+        "x": 3,
+        "y": 8
+    },
+    {
+        "name": " Eel\r",
+        "x": 4,
+        "y": 8
+    },
+    {
+        "name": " Cow\r",
         "x": 5,
+        "y": 8
+    },
+    {
+        "name": " Cat\r",
+        "x": 10,
         "y": 8
     },
     {
@@ -21,7 +41,7 @@
     },
     {
         "name": "CRANE",
-        "x": 6,
-        "y": 7
+        "x": 0,
+        "y": 0
     }
 ]

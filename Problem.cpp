@@ -1,5 +1,6 @@
 #include "Problem.h"
 #include <iostream>
+#include <algorithm>
 
 
 using namespace std;
@@ -413,6 +414,7 @@ void Problem::searchSolutionPath(){
     while(!unexplored_ship_states.empty() && !balCheck){
         
         curr_node = unexplored_ship_states.top();
+        cout << "POPPED NODE MOVING CONTAINER: " << curr_node.moving_container << endl;
         cout << "COST FOR THE TOP OF THE QUEUE: " << curr_node.cost << endl; 
         unexplored_ship_states.pop();
         explored_ship_states.push_back(curr_node);
@@ -454,6 +456,7 @@ void Problem::searchSolutionPath(){
                     //crane_moved_node.parent = &curr_node;
                     //crane_moved_node.parent = &explored_ship_states.back();
                     crane_moved_node.parent = explored_ship_states.size()-1;
+                    crane_moved_node.moving_container = containers.at(c);
                     moveCranetoContainer(crane_moved_node, containers.at(c));
                     unexplored_ship_states.push(crane_moved_node);
                 }
@@ -476,25 +479,35 @@ void Problem::searchSolutionPath(){
 void Problem::traceSolutionPath(){
 
     ShipNode temp = final_ship_state; 
+    temp.moving_container = final_ship_state.moving_container;
     solution_path.push(final_ship_state);
+    solution_path_vec.push_back(final_ship_state);
+    //explore.back == final ship state
+    solution_path_vec.push_back(explored_ship_states.back());
     //add the final state before crane is moved back
     solution_path.push(explored_ship_states.back());
     //set temp to the next node
     //int i=0;
     while (!(temp == initial_ship_state))
     {
-        cout << "node" << endl;
+        //cout << "node" << endl;
         temp = explored_ship_states.at(temp.parent);
         updatefinalSpots(temp);
         solution_path.push(temp);
+        solution_path_vec.push_back(temp);
         //i++;
     }
     //solution_path.push(explored_ship_states.back());
-    //cout << "why" << endl;
+    cout << "SOL PATH VEC SIZE:"<<solution_path_vec.size() << endl;
     if (final_ship_state.cost == 0) {
         max_steps = 0;
     } else {
         max_steps = solution_path.size()-1;
+    }
+
+    reverse(solution_path_vec.begin(), solution_path_vec.end());
+    for(int i = 0; i < solution_path_vec.size(); i++){
+        cout << solution_path_vec.at(i).cost << endl;
     }
 
     cout << "solution_path.size(): " << solution_path.size() << endl;
@@ -646,28 +659,38 @@ string Problem::setUI(ofstream& log_file) {
     
         //if this is the first log file statement, print move crane to container
         if (step == 1){
+            int final_y_grid = 9 - get_y_coord(curr_node, curr_node.moving_container);
+            int final_x_grid = get_x_coord(curr_node, curr_node.moving_container)+1;
             log_file << (local->tm_mon + 1) << " "
                 << local->tm_mday << " "
                 << (local->tm_year + 1900) << ": "
                 << setw(2) << setfill('0') << local->tm_hour << ":"
                 << setw(2) << setfill('0') << local->tm_min
                 << " " << step << " out of " << max_steps << ": Move from PARK to [" 
-                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
-                get_x_coord(curr_node, curr_node.moving_container) << "], " << 
+                << final_y_grid << ", " << 
+                final_x_grid << "], " << 
                 curr_node.cost << " minutes." << endl;
 
             log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move from PARK to [" 
-                + to_string(get_y_coord(curr_node, curr_node.moving_container)) +", " + 
-                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "], " + 
+                + to_string(final_y_grid) +", " + 
+                to_string(final_x_grid) + "], " + 
                 to_string(curr_node.cost) + " minutes.\n";
         }
         else if(step < max_steps){
+
             //otherwise, default step print:
             //grab the next value and store it
-            ShipNode next_node_temp = solution_path.top();
+            //cout << "SOL NODE SIZE: " << solution_path.size() << endl;
+            ShipNode prev_node = solution_path_vec.at(step-1);
+            cout <<"CURR NODE COST: " << curr_node.cost << endl;
+            cout << "PREV NODE COST: "<< prev_node.cost << endl;
             //restore curr node after grabbing next value
+            int final_y_grid = 9 - get_y_coord(curr_node, curr_node.moving_container);
+            int final_x_grid = get_x_coord(curr_node, curr_node.moving_container)+1;
 
-            cout << " CURR NODE MOVING CONTAINER" << curr_node.moving_container << endl;
+            int final_prev_y_grid = 9 - get_y_coord(prev_node, prev_node.moving_container);
+            int final_prev_x_grid = get_x_coord(prev_node, prev_node.moving_container)+1;
+
 
             log_file << (local->tm_mon + 1) << " "
                 << local->tm_mday << " "
@@ -675,21 +698,23 @@ string Problem::setUI(ofstream& log_file) {
                 << setw(2) << setfill('0') << local->tm_hour << ":"
                 << setw(2) << setfill('0') << local->tm_min
                 << " " << step << " out of " << max_steps << ": Move container in [" 
-                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
-                get_x_coord(curr_node, curr_node.moving_container) << "] to [" << 
-                get_y_coord(next_node_temp, curr_node.moving_container) << ", " << 
-                get_x_coord(next_node_temp, curr_node.moving_container) << "], "<<
+                << final_prev_y_grid << ", " << 
+                final_prev_x_grid << "] to [" << 
+                final_y_grid << ", " << 
+                final_x_grid << "], "<<
                 curr_node.cost << " minutes." << endl;
 
             log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move container in [" 
-                + to_string(get_y_coord(curr_node, curr_node.moving_container)) + ", " + 
-                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "] to [" + 
-                to_string(get_y_coord(next_node_temp, curr_node.moving_container)) + ", " + 
-                to_string(get_x_coord(next_node_temp, curr_node.moving_container)) + "], "+
+                + to_string(final_prev_y_grid) + ", " + 
+                to_string(final_prev_x_grid) + "] to [" + 
+                to_string(final_y_grid) + ", " + 
+                to_string(final_x_grid) + "], "+
                 to_string(curr_node.cost) + " minutes.\n";
             
         }
         else if (step == max_steps){
+            int final_y_grid = 9 - get_y_coord(curr_node, curr_node.moving_container);
+            int final_x_grid = get_x_coord(curr_node, curr_node.moving_container)+1;
             //if we are at the final ship state
             log_file << (local->tm_mon + 1) << " "
                 << local->tm_mday << " "
@@ -697,13 +722,13 @@ string Problem::setUI(ofstream& log_file) {
                 << setw(2) << setfill('0') << local->tm_hour << ":"
                 << setw(2) << setfill('0') << local->tm_min
                 << " " << step << " out of " << max_steps << ": Move from [" 
-                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
-                get_x_coord(curr_node, curr_node.moving_container) << "] to PARK, " << 
+                << final_y_grid << ", " << 
+                final_x_grid << "] to PARK, " << 
                 curr_node.cost << " minutes." << endl;
 
             log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move from [" 
-                + to_string(get_y_coord(curr_node, curr_node.moving_container)) + ", " + 
-                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "] to PARK, " +
+                + to_string(final_y_grid) + ", " + 
+                to_string(final_x_grid) + "] to PARK, " +
                 to_string(curr_node.cost) + " minutes.\n";
 
             
