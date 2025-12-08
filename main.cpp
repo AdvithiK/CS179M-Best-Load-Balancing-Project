@@ -24,6 +24,35 @@ using namespace std::chrono;
 string outbound_name;
 
 string parseManifest(Problem& p, const string& name, ofstream& log) {
+    string log_file;
+  
+    time_t now = time(nullptr);
+    tm *local = localtime(&now);
+
+    ostringstream oss;
+    oss << name 
+        << (local->tm_mon + 1) << "_"
+        << local->tm_mday << "_"
+        << (local->tm_year + 1900) << "_"
+        << setw(2) << setfill('0') << local->tm_hour
+        << setw(2) << setfill('0') << local->tm_min
+        << ".txt";
+
+    log_file = oss.str();
+
+    log.open(log_file);
+    if (!log.is_open()) {
+        cout << "Could not open output file: " << log_file+".txt" << endl;
+    }
+
+    log << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << " Program was started." << endl;
+
+
     vector<vector<Container>> initial_ship_state(9, vector<Container>(12));
 
 
@@ -127,34 +156,9 @@ int main(){
     system("open http://localhost:8080/index.html");
     ShipNode emptyNode;
     Problem p(emptyNode);
+    ofstream log;
 
-    string log_file;
-  
-    time_t now = time(nullptr);
-    tm *local = localtime(&now);
-
-    ostringstream oss;
-    oss << "KeoghsPort"
-        << (local->tm_mon + 1) << "_"
-        << local->tm_mday << "_"
-        << (local->tm_year + 1900) << "_"
-        << setw(2) << setfill('0') << local->tm_hour
-        << setw(2) << setfill('0') << local->tm_min
-        << ".txt";
-
-    log_file = oss.str();
-
-    ofstream log(log_file);
-    if (!log.is_open()) {
-        cout << "Could not open output file: " << log_file+".txt" << endl;
-    }
-
-    log << (local->tm_mon + 1) << " "
-        << local->tm_mday << " "
-        << (local->tm_year + 1900) << ": "
-        << setw(2) << setfill('0') << local->tm_hour << ":"
-        << setw(2) << setfill('0') << local->tm_min
-        << " Program was started." << endl;
+    
 
     server.Post("/run", [&p, &log](const httplib::Request& req, httplib::Response& res){
         string data = parseManifest(p, req.body, log);
@@ -176,6 +180,7 @@ int main(){
             res.set_content("OK", "text/plain");
             res.set_header("Access-Control-Allow-Origin", "*");
         }
+
  
     });
 
