@@ -237,7 +237,7 @@ public:
 
     void moveCranetoOrigin(ShipNode &node);
 
-    void algo(ShipNode&node, ofstream& log_file, string filename);
+    string algo(ShipNode&node, ofstream& log_file, string filename);
 
 
     //search algo function 
@@ -270,6 +270,7 @@ public:
     void setUI();
 
     void alterLog(ofstream&, string comment);
+
 
     vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);
 

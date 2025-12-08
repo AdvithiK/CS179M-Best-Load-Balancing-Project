@@ -474,7 +474,7 @@ void Problem::traceSolutionPath(){
 };
 
 
-void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
+string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
 
     time_t now = time(0);
     tm *local = localtime(&now);
@@ -492,7 +492,10 @@ void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
         << containers.size() << " container(s) on the ship." << endl;
 
     searchSolutionPath();
+    
     traceSolutionPath();
+
+    return "4,4"; 
    
 
 }
@@ -541,3 +544,6 @@ void Problem::setUI() {
     }
     
 }
+
+
+
