@@ -124,6 +124,35 @@ function nextMoveScreen() {
 }
 
 
+async function runAlgorithm(filename) {
+ 
+  try {
+      // Send filename to C++, WAIT for it to complete
+      const response = await fetch('http://localhost:8080/run', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'text/plain',
+          },
+          body: filename  // Send just the filename
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+          console.log("ALGO RAN")
+          showReadyScreen();
+      } else {
+          showError("Algorithm failed");
+      }
+
+  } catch (error) {
+      console.error("Error:", error);
+      showError("Failed to run algorithm");
+  }
+}
+
+
+
 async function updatetoReady() {
     try {
         const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
@@ -168,20 +197,36 @@ async function updateData() {
 // });
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Submit button
+
     const btn = document.getElementById("submit-btn");
 
     function handleManifest() {
       const value = document.getElementById("text-box").value;
       console.log("User typed:", value);
 
-      fetch("http://localhost:5051/run", {
+      fetch("http://localhost:8080/run", {
           method: "POST",
+          headers: { "Content-Type": "text/plain" },
           body: value
       })
       .then(res => res.text())
-      .then(text => console.log("Server responded:", text))
+      .then(text => { 
+        console.log(text)
+        if(text != "") {
+          const parts = text.split(",");
+          const moves = parts[0];
+          const minutes = parts[1];
+
+          document.querySelector("#ready-screen h1:nth-child(2)").textContent = `${moves} move(s)`;
+          document.querySelector("#ready-screen h1:nth-child(3)").textContent = `${minutes} minute(s)`;
+          showReadyScreen(); 
+
+        } else {
+            alert("Algorithm failed or file not found!");
+        }
+      })
       .catch(err => console.error("Fetch error:", err));
+      
     }
 
     btn.addEventListener("click", handleManifest);
@@ -189,12 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Enter key handling
     document.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-            if (!firstEnter) {
-                handleManifest();
-                firstEnter = true;
-            } else {
-                nextMoveScreen();
-            }
+           
         }
     });
 

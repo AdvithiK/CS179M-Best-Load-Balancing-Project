@@ -508,7 +508,7 @@ void Problem::traceSolutionPath(){
 };
 
 
-void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
+string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
 
     time_t now = time(0);
     tm *local = localtime(&now);
@@ -538,6 +538,10 @@ void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
         << setw(2) << setfill('0') << local->tm_min
         << " Balance Solution found, it will require " << max_steps 
         << " moves/" << total_cost << " minutes." << endl;
+    
+
+    return to_string(max_steps) + "," + to_string(total_cost);
+   
 
 }
 
@@ -666,37 +670,4 @@ void Problem::setUI(ofstream& log_file) {
     
 }
 
-// void Problem::outputStepsToJSON(const string& filename) {
-//     json steps_json = json::array();
-    
-//     stack<ShipNode> temp_path = solution_path;
-//     int step_num = 0;
-    
-//     while (!temp_path.empty()) {
-//         ShipNode node = temp_path.top();
-//         temp_path.pop();
-        
-//         json step;
-//         step["step_number"] = step_num++;
-//         step["cost"] = node.cost;
-        
-//         json grid = json::array();
-//         for (int i = 8; i >= 0; i--) {
-//             json row = json::array();
-//             for (int j = 0; j < 12; j++) {
-//                 json cell;
-//                 cell["name"] = node.default_ship_state[i][j].name;
-//                 cell["weight"] = node.default_ship_state[i][j].weight;
-//                 row.push_back(cell);
-//             }
-//             grid.push_back(row);
-//         }
-//         step["grid"] = grid;
-        
-//         steps_json.push_back(step);
-//     }
-    
-//     ofstream out(filename);
-//     out << steps_json.dump(4);
-//     out.close();
-// }
+

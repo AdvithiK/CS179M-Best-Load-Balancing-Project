@@ -27,14 +27,14 @@ using namespace std::chrono;
 //     return s.substr(start, end - start + 1);
 // }
 
-bool parseManifest(const string& name) {
+string parseManifest(const string& name) {
     string log_file;
   
     time_t now = time(nullptr);
     tm *local = localtime(&now);
 
     ostringstream oss;
-    oss << "KeoughsPort"
+    oss << "KeoghsPort"
         << (local->tm_mon + 1) << "_"
         << local->tm_mday << "_"
         << (local->tm_year + 1900) << "_"
@@ -83,14 +83,14 @@ bool parseManifest(const string& name) {
 
     if(!file.is_open()){
         cout << "Errors occured when opening the file: \"" << input_file << endl;
-        return 1;
+        return "";
     }
 
 
     //check if file is empty. If it is, exit program
     if (file.peek() == ifstream::traits_type::eof()) {
         cout << "The file is empty. Exiting program." << endl;
-        return 1;
+        return "";
     }
 
     /* example file look
@@ -166,43 +166,51 @@ bool parseManifest(const string& name) {
     ofstream out(output_file);
     if (!out.is_open()) {
         cout << "Could not open output file: " << output_file+".txt" << endl;
-        return 1;
+        return "";
     }
 
-    // run the algorithm
-    p.algo(initial_node, log, input_file+".txt");
-    //p.outputStepsToJSON(input_file + "STEPS.json");
+
+    
+    string final_values = p.algo(initial_node, log, input_file+".txt");
     out << p.final_ship_state; 
 
-    // out.close();
-    // log.close();
+    out.close();
+    log.close();
+
+    return final_values;
 
 }
+
 
 int main(){
 
     // start up the server
     // register the value that gets into the test file
     // run the parsing
+    // bring up the loading screen - auto switch to next screen when algo is done
     cout.sync_with_stdio(true);
     httplib::Server server;
-
+    server.set_base_dir("./UI"); 
 
     server.Post("/run", [](const httplib::Request& req, httplib::Response& res){
         cout << "POST received with body: " << req.body << std::endl;
-        cout.flush();
+        string data = parseManifest(req.body);
+        
+    
 
-        bool success = parseManifest(req.body);
+        if (!data.empty()) {
+            res.set_content(data, "text/plain");
+        } else {
+            res.set_content("ERROR", "text/plain");
+        }
 
-        cout << "parseManifest returned: " << success << std::endl;
-        cout.flush();
-
-        res.set_content("OK", "text/plain");
+        
         res.set_header("Access-Control-Allow-Origin", "*");
     });
 
-    cout << "Server running on http://localhost:5050\n";
-    server.listen("localhost", 5050);
+    cout << "Server running on http://localhost:8080\n";
+
+    server.listen("localhost", 8080);
 
 
     
