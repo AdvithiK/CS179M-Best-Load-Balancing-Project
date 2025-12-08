@@ -32,18 +32,28 @@ h1 {
 
 
 .program-container {
-    display: flex;
+    /* display: flex;
     flex-direction: column;
     justify-content: center; 
     align-items: center;     
     height: 100vh;
     gap: 5px;
+    position: fixed;
+    bottom: 20px; */
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #ShipBox {
 
     border: 2px solid black;
-    position: fixed;
-    bottom: 20px;       /* margin from the bottom */
    
 }
+

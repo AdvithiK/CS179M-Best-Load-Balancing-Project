@@ -27,35 +27,8 @@ using namespace std::chrono;
 //     return s.substr(start, end - start + 1);
 // }
 
-string parseManifest(const string& name) {
-    string log_file;
-  
-    time_t now = time(nullptr);
-    tm *local = localtime(&now);
-
-    ostringstream oss;
-    oss << "KeoghsPort"
-        << (local->tm_mon + 1) << "_"
-        << local->tm_mday << "_"
-        << (local->tm_year + 1900) << "_"
-        << setw(2) << setfill('0') << local->tm_hour
-        << setw(2) << setfill('0') << local->tm_min
-        << ".txt";
-
-    log_file = oss.str();
-
-    ofstream log(log_file);
-    if (!log.is_open()) {
-        cout << "Could not open output file: " << log_file+".txt" << endl;
-    }
-
-    // // write: 10 18 2023: 01:14 Program was started.
-    log << (local->tm_mon + 1) << " "
-        << local->tm_mday << " "
-        << (local->tm_year + 1900) << ": "
-        << setw(2) << setfill('0') << local->tm_hour << ":"
-        << setw(2) << setfill('0') << local->tm_min
-        << " Program was started." << endl;
+string parseManifest(Problem& p, const string& name, ofstream& log) {
+    
  
 
     //2D array 
@@ -158,7 +131,7 @@ string parseManifest(const string& name) {
     ShipNode initial_node(initial_ship_state);
 
     //ShipNode small_initial_node(small_ship_state);
-    Problem p(initial_node);
+    p.initial_ship_state = initial_node;
 
     string output_file;
     output_file = input_file+"OUTBOUND"+".txt";
@@ -191,12 +164,47 @@ int main(){
     cout.sync_with_stdio(true);
     httplib::Server server;
     server.set_base_dir("./UI"); 
+    ShipNode emptyNode;
+    Problem p(emptyNode);
 
-    server.Post("/run", [](const httplib::Request& req, httplib::Response& res){
+    string log_file;
+  
+    time_t now = time(nullptr);
+    tm *local = localtime(&now);
+
+    ostringstream oss;
+    oss << "KeoghsPort"
+        << (local->tm_mon + 1) << "_"
+        << local->tm_mday << "_"
+        << (local->tm_year + 1900) << "_"
+        << setw(2) << setfill('0') << local->tm_hour
+        << setw(2) << setfill('0') << local->tm_min
+        << ".txt";
+
+    log_file = oss.str();
+
+    ofstream log(log_file);
+    if (!log.is_open()) {
+        cout << "Could not open output file: " << log_file+".txt" << endl;
+    }
+
+    // // write: 10 18 2023: 01:14 Program was started.
+    log << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << " Program was started." << endl;
+
+
+
+
+
+
+    server.Post("/run", [&p, &log](const httplib::Request& req, httplib::Response& res){
         cout << "POST received with body: " << req.body << std::endl;
-        string data = parseManifest(req.body);
-        
-    
+        string data = parseManifest(p, req.body, log);
+        p.setInitialNode();
 
         if (!data.empty()) {
             res.set_content(data, "text/plain");
@@ -205,6 +213,18 @@ int main(){
         }
 
         
+        
+        res.set_header("Access-Control-Allow-Origin", "*");
+    });
+
+    server.Post("/nextmove", [&p, &log](const httplib::Request& req, httplib::Response& res){
+        cout << "Next-move POST received" << std::endl;
+
+        // Run the next C++ command (example: advance the algorithm one step)
+        string sentence = p.setUI(log); // or whatever function you want to call
+
+        res.set_content(sentence, "text/plain");
+
         res.set_header("Access-Control-Allow-Origin", "*");
     });
 

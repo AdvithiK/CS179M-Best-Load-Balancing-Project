@@ -216,6 +216,9 @@ public:
     //stores a list of containers in the ship (pointers? im doing copies for time being)
     vector<Container> containers;
 
+    // for printing purposes
+    vector<Container> NANcontainers;
+
     //priority based on lowest cost states
     priority_queue<ShipNode> unexplored_ship_states;
 
@@ -229,6 +232,8 @@ public:
 
     //finds all the containers in the ship & adds it to the containers list
     void findContainers(const ShipNode& node);
+
+    void findNAN(const ShipNode& node);
 
     //updates the final x and y of containers
     void updateContainers(const ShipNode& node);
@@ -279,9 +284,11 @@ public:
     void balanceCheck(ShipNode& node);
 
 
-    void setUI(ofstream& log_file);
+    string setUI(ofstream& log_file);
 
     void alterLog(ofstream&, string comment);
+    
+    void setInitialNode();
 
 
     vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);

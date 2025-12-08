@@ -1,11 +1,23 @@
 const canvas = document.getElementById("ShipBox");
 const ctx = canvas.getContext("2d");
 
-const rows = 8;      
+const rows = 9; 
+const visiblerows = 8;     
 const cols = 12;     
 const colWidth = canvas.width/cols;
-const rowLength = canvas.height/rows;
+const internalrow_length = canvas.height/visiblerows;
+const visiblerow_length = canvas.height/visiblerows
 let firstEnter = true;
+
+function drawCrane() {
+  const x = 0 * colWidth;   // left side
+  const y = 9 * internalrow_length;  // above the top of the visible grid
+
+  ctx.fillStyle = "red";
+  ctx.globalAlpha = 0.7;
+  ctx.fillRect(x, y, colWidth, internalrow_length);
+  ctx.globalAlpha = 1.0;
+}
 
 
 function drawGrid() {
@@ -19,73 +31,69 @@ function drawGrid() {
       ctx.stroke();
     }
 
-    for (let r = 0; r <= 12; r++) {
+    for (let r = 0; r <= visiblerows; r++) {
         ctx.beginPath();
-        ctx.moveTo(0, r*rowLength);
-        ctx.lineTo(canvas.width, r*rowLength);
+        ctx.moveTo(0, r*visiblerow_length);
+        ctx.lineTo(canvas.width, r*visiblerow_length);
         ctx.stroke();
     }
 }
 
-function drawEmptyContainers() {
-    ctx.fillStyle = "grey";
-    ctx.strokeStyle = "black";
-
-    containers.forEach(con => {
-      let px = con.x * colWidth;    
-      let py = (rows - 1 - con.y) * rowLength;  // y starts from the bottom
-
-      ctx.fillRect(px, py, colWidth, rowLength);
-      ctx.strokeRect(px, py, colWidth, rowLength);
-
-      ctx.fillStyle = "black";
-      ctx.fillStyle = "grey";
-    });
-
-}
 
 function drawContainers() {
+  ctx.clearReact;
   const colors = [
-    "red",
-    "blue",
-    "green",
-    "yellow",
-    "orange",
-    "purple",
-    "pink",
-    "cyan",
-    "magenta",
-    "lime",
-    "teal",
-    "brown",
-    "gold",
-    "navy",
-    "olive",
-    "coral",
-  ];
+  "#FFD700", 
+  "#FFA500", 
+  "#FFB6C1", 
+  "#87CEFA", 
+  "#90EE90", 
+  "#FF69B4", 
+  "#FFE4B5", 
+  "#98FB98", 
+  "#AFEEEE", 
+  "#F0E68C", 
+  "#D8BFD8", 
+  "#E0FFFF", 
+  "#FFDAB9", 
+  "#FFEFD5", 
+  "#F5DEB3",
+  "#F08080"  
+];
 
 
-    fetch("data.json")
+    fetch("data.json?ts="+ Date.now())
       .then(response => response.json())
       .then(containers => {
           let colorIndex = 0;
           containers.forEach(con => {
-          let px = con.x * colWidth;    
-          let py = (rows - 1 - con.y) * rowLength;  // y starts from the bottom
+          
+          let px = con.x * colWidth;
+          let py = (con.y-1) * visiblerow_length;
 
-          // *** some kind of check if the function is NaN or not ***
-          ctx.fillStyle = colors[colorIndex];
-          colorIndex++;
+          
+          // skip if its the crane
+          if (py != 9) {
+            // if name is NAN, color the box grey
+            if (con.name == "NAN") ctx.fillStyle = "grey";
+            else {
+              ctx.fillStyle = colors[colorIndex];
+              colorIndex++;
+            }
+            
 
-          ctx.fillRect(px, py, colWidth, rowLength);
-          ctx.strokeRect(px, py, colWidth, rowLength);
+            ctx.fillRect(px, py, colWidth, visiblerow_length);
+            ctx.strokeRect(px, py, colWidth, visiblerow_length);
 
-          ctx.fillStyle = "black";           
-          ctx.font = "27px Arial";           
-          ctx.fillText(con.name, px + 5, py+25); 
+            ctx.fillStyle = "black";           
+            ctx.font = "12px Arial";           
+            ctx.fillText(con.name, px + 1, py+25); 
+          }
         });
 
       });
+
+    // drawCrane();
 }
 
 
@@ -112,6 +120,7 @@ function showReadyScreen() {
     document.getElementById("ready-screen").style.display = "block";
     document.getElementById("next-move-screen").style.display = "none";
     drawGrid();
+    drawContainers();
 }
 
 function nextMoveScreen() {
@@ -124,32 +133,7 @@ function nextMoveScreen() {
 }
 
 
-async function runAlgorithm(filename) {
- 
-  try {
-      // Send filename to C++, WAIT for it to complete
-      const response = await fetch('http://localhost:8080/run', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'text/plain',
-          },
-          body: filename  // Send just the filename
-      });
 
-      const result = await response.json();
-
-      if (result.success) {
-          console.log("ALGO RAN")
-          showReadyScreen();
-      } else {
-          showError("Algorithm failed");
-      }
-
-  } catch (error) {
-      console.error("Error:", error);
-      showError("Failed to run algorithm");
-  }
-}
 
 
 
@@ -182,19 +166,7 @@ async function updateData() {
     }
 }
 
-// document.addEventListener("keydown", (e) => {
-//     if (e.key === "Enter") {
-//       if (!firstEnter) {
-//           handleManifest(); 
-//           updateData();
-//           updatetoReady();
-//           firstEnter = true;
-//         } else {
-//             nextMoveScreen();
-//         }
-//     }
-  
-// });
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -232,13 +204,30 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", handleManifest);
 
     // Enter key handling
+    
     document.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-           
+            fetch("http://localhost:8080/nextmove", { method: "POST" })
+              .then(res => res.text())       
+              .then(text => {
+                  if (text === "DONE") {
+                      console.log("No more moves");
+                        
+                  } else {
+                    const logContainer = document.querySelector("#next-move-screen");
+                    const p = document.createElement("p");
+                    p.textContent = text;
+                    logContainer.appendChild(p);
+
+                    // redraw canvas with updated JSON
+                    
+                    nextMoveScreen();
+                  }
+              })
+              .catch(err => console.error("Next move fetch error:", err));
         }
     });
 
-    showManifestScreen();
 });
 
 

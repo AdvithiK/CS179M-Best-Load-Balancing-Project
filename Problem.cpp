@@ -27,12 +27,15 @@ int get_y_coord(const ShipNode& node, const Container& box){
     for(int i=0; i<node.default_ship_state.size(); i++){
         for(int j=0; j<node.default_ship_state[i].size(); j++){
             const Container& c = node.default_ship_state[i][j];
-            if(trim(c.name) == trim(box.name) &&
+            if(trim(c.name) == trim(box.name) && trim(c.name) != "NAN" &&
+               c.weight == box.weight){
+                return i;
+            } else if(trim(c.name) == trim(box.name) &&
                c.weight == box.weight &&
                c.initial_y == box.initial_y &&
                c.initial_x == box.initial_x){
                 return i;
-            }
+            } 
         }
     }
     return -1;
@@ -43,12 +46,15 @@ int get_x_coord(const ShipNode& node, const Container& box){
     for(int i=0; i<node.default_ship_state.size(); i++){
         for(int j=0; j<node.default_ship_state[i].size(); j++){
             const Container& c = node.default_ship_state[i][j];
-            if(trim(c.name) == trim(box.name) &&
+            if(trim(c.name) == trim(box.name) && trim(c.name) != "NAN" &&
+               c.weight == box.weight){
+                return j;
+            } else if(trim(c.name) == trim(box.name) &&
                c.weight == box.weight &&
                c.initial_y == box.initial_y &&
                c.initial_x == box.initial_x){
                 return j;
-            }
+            } 
         }
     }
     return -1;
@@ -68,6 +74,20 @@ void Problem::findContainers(const ShipNode& node){
             if (name != "UNUSED" && name != "NAN" && name != "CRANE"){
                 Container temp_container = node.default_ship_state[i][j];
                 containers.push_back(temp_container);
+            }
+        }
+    }
+
+};
+
+void Problem::findNAN(const ShipNode& node){
+    //loop thru the 2D array and find all NAN, append them to the list (copy for now, prob can be done with pointers)
+    for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
+        for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
+            string name = trim(node.default_ship_state[i][j].name);
+            if (name == "NAN"){
+                Container temp_container = node.default_ship_state[i][j];
+                NANcontainers.push_back(temp_container);
             }
         }
     }
@@ -451,35 +471,12 @@ void Problem::searchSolutionPath(){
     
 };
 
-//once final ShipNode is found, this function adds it and all it's ancestors to the final solution stack
-// void Problem::traceSolutionPath(){
-//     ShipNode* the_parent = &final_ship_state;
-//     // solution_path.push(the_parent);
-//     // the_parent = the_parent->parent;  
-//     // if (the_parent == nullptr) cout << "YEHAHADHUIFHSDF" << endl;
-//     // cout << the_parent << endl;
-//     // solution_path.push(the_parent);
-//     // the_parent = the_parent->parent;  
-//     // solution_path.push(the_parent);
-//     // the_parent = the_parent->parent;  
-//     // solution_path.push(the_parent);
 
-//     while (the_parent != nullptr) {
-        
-//         solution_path.push(the_parent);
-//         cout << the_parent->getCost() << endl;
-//         the_parent = the_parent->parent;  
-//     }
-    
-//     cout << "solution_path.size(): " << solution_path.size() << endl;
-
-
-// };
 
 void Problem::traceSolutionPath(){
 
     ShipNode temp = final_ship_state; 
-    solution_path.push(temp);
+    solution_path.push(final_ship_state);
     //add the final state before crane is moved back
     solution_path.push(explored_ship_states.back());
     //set temp to the next node
@@ -494,7 +491,12 @@ void Problem::traceSolutionPath(){
     }
     //solution_path.push(explored_ship_states.back());
     //cout << "why" << endl;
-    max_steps = solution_path.size();
+    if (final_ship_state.cost == 0) {
+        max_steps = 0;
+    } else {
+        max_steps = solution_path.size()-1;
+    }
+
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
     //print out the solution path
@@ -515,6 +517,8 @@ string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
     string verb = "are ";
 
     findContainers(node);
+    findNAN(node);
+    cout << "NAN size: " << NANcontainers.size() << endl;
     if (containers.size() == 1) verb = "is ";
 
     log_file << (local->tm_mon + 1) << " "
@@ -528,7 +532,7 @@ string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
     searchSolutionPath();
     //loads the solution path stack with the trace to final solution
     traceSolutionPath();
-    int max_steps = solution_path.size();
+    // int max_steps = solution_path.size();
     int total_cost = final_ship_state.cost;
 
     log_file << (local->tm_mon + 1) << " "
@@ -569,38 +573,77 @@ void Problem::reportCommenttoLog(ofstream& log_file, string comment){
         << "A comment was written to the log \"" << comment << "\""<< endl;
 }
 
-void Problem::setUI(ofstream& log_file) {
+void Problem::setInitialNode() {
+    ShipNode curr_node = solution_path.top();
+    solution_path.pop();
+
+    //formatting the info for 
+    json shipData;
+    for(int i = 0; i < containers.size(); i++){
+        shipData[i]["name"] = containers.at(i).name;
+        shipData[i]["x"] = get_x_coord(curr_node, containers.at(i));
+        shipData[i]["y"] = get_y_coord(curr_node, containers.at(i));
+    }
+
+    for(int i = 0; i < NANcontainers.size(); i++){
+        shipData[i+containers.size()]["name"] = "NAN";
+        shipData[i+containers.size()]["x"] = get_x_coord(curr_node, NANcontainers.at(i));
+        shipData[i+containers.size()]["y"] = get_y_coord(curr_node, NANcontainers.at(i));
+    }
+
+    // add crane info 
+    Container crane = getCrane(curr_node);
+    shipData[containers.size()+NANcontainers.size()]["name"] = crane.name;
+    shipData[containers.size()+NANcontainers.size()]["x"] = 1;
+    shipData[containers.size()+NANcontainers.size()]["y"] = 0;
+
+    ofstream file("UI/data.json");
+    file << shipData.dump(4); 
+    file.close();
+
+}
+
+string Problem::setUI(ofstream& log_file) {
     // for each node in solution_path, reset the json file 
     // enter should go to the next node in solution_path
     // if you hit enter and the json file doesn't get updated ? then return finished solution 
     // screen ?
 
+    cout << "SETTING UI" << endl;
+    string log_sentence;
     //set time stamp for log file
     time_t now = time(0);
     tm *local = localtime(&now);
     
     if (solution_path.size() > 0) {
         ShipNode curr_node = solution_path.top();
+        if (curr_node == final_ship_state) cout <<"IOSJDFIOSDFIJO"<< endl;
+        
         solution_path.pop();
 
         //formatting the info for 
         json shipData;
         for(int i = 0; i < containers.size(); i++){
-            shipData[i]["name"] = containers[i].weight;
+            shipData[i]["name"] = containers.at(i).name;
             shipData[i]["x"] = get_x_coord(curr_node, containers.at(i));
-            shipData[i]["y"] = get_y_coord(curr_node, containers.at(i))-1;
-            // add a bool to color the active box / crane red
-            // shipData[i]["active"] =
+            shipData[i]["y"] = get_y_coord(curr_node, containers.at(i));
+        }
+
+        for(int i = 0; i < NANcontainers.size(); i++){
+            shipData[i+containers.size()]["name"] = "NAN";
+            shipData[i+containers.size()]["x"] = get_x_coord(curr_node, NANcontainers.at(i));
+            shipData[i+containers.size()]["y"] = get_y_coord(curr_node, NANcontainers.at(i));
         }
 
         // add crane info 
         Container crane = getCrane(curr_node);
-        shipData[containers.size()]["name"] = crane.name;
-        shipData[containers.size()]["x"] = get_x_coord(curr_node, crane);
-        shipData[containers.size()]["y"] = get_y_coord(curr_node, crane)-1;
-        // shipData[containers.size()]["active"] =  
+        shipData[containers.size()+NANcontainers.size()]["name"] = crane.name;
+        shipData[containers.size()+NANcontainers.size()]["x"] = get_x_coord(curr_node, crane);
+        shipData[containers.size()+NANcontainers.size()]["y"] = get_y_coord(curr_node, crane);
+
         //store which step we are at based on solution_path size
         int step = max_steps - solution_path.size();
+    
         //if this is the first log file statement, print move crane to container
         if (step == 1){
             log_file << (local->tm_mon + 1) << " "
@@ -612,14 +655,19 @@ void Problem::setUI(ofstream& log_file) {
                 << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
                 get_x_coord(curr_node, curr_node.moving_container) << "], " << 
                 curr_node.cost << " minutes." << endl;
+
+            log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move from PARK to [" 
+                + to_string(get_y_coord(curr_node, curr_node.moving_container)) +", " + 
+                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "], " + 
+                to_string(curr_node.cost) + " minutes.\n";
         }
         else if(step < max_steps){
             //otherwise, default step print:
             //grab the next value and store it
-            solution_path.pop();
             ShipNode next_node_temp = solution_path.top();
             //restore curr node after grabbing next value
-            solution_path.push(curr_node);
+
+            cout << " CURR NODE MOVING CONTAINER" << curr_node.moving_container << endl;
 
             log_file << (local->tm_mon + 1) << " "
                 << local->tm_mday << " "
@@ -632,6 +680,14 @@ void Problem::setUI(ofstream& log_file) {
                 get_y_coord(next_node_temp, curr_node.moving_container) << ", " << 
                 get_x_coord(next_node_temp, curr_node.moving_container) << "], "<<
                 curr_node.cost << " minutes." << endl;
+
+            log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move container in [" 
+                + to_string(get_y_coord(curr_node, curr_node.moving_container)) + ", " + 
+                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "] to [" + 
+                to_string(get_y_coord(next_node_temp, curr_node.moving_container)) + ", " + 
+                to_string(get_x_coord(next_node_temp, curr_node.moving_container)) + "], "+
+                to_string(curr_node.cost) + " minutes.\n";
+            
         }
         else if (step == max_steps){
             //if we are at the final ship state
@@ -644,16 +700,23 @@ void Problem::setUI(ofstream& log_file) {
                 << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
                 get_x_coord(curr_node, curr_node.moving_container) << "] to PARK, " << 
                 curr_node.cost << " minutes." << endl;
+
+            log_sentence = to_string(step) + " out of " + to_string(max_steps) + ": Move from [" 
+                + to_string(get_y_coord(curr_node, curr_node.moving_container)) + ", " + 
+                to_string(get_x_coord(curr_node, curr_node.moving_container)) + "] to PARK, " +
+                to_string(curr_node.cost) + " minutes.\n";
+
+            
         }
         else{
             //final ship state solution is displayed, return the final manifest
-            log_file << (local->tm_mon + 1) << " "
-                << local->tm_mday << " "
-                << (local->tm_year + 1900) << ": "
-                << setw(2) << setfill('0') << local->tm_hour << ":"
-                << setw(2) << setfill('0') << local->tm_min
-                << "Finished a Cycle. Manifest" << "GRAB MANIFEST NAME" << 
-                "was written to desktop, and a reminder pop-up to operator to send file was displayed." << endl;
+            // log_file << (local->tm_mon + 1) << " "
+            //     << local->tm_mday << " "
+            //     << (local->tm_year + 1900) << ": "
+            //     << setw(2) << setfill('0') << local->tm_hour << ":"
+            //     << setw(2) << setfill('0') << local->tm_min
+            //     << "Finished a Cycle. Manifest" << "GRAB MANIFEST NAME" << 
+            //     "was written to desktop, and a reminder pop-up to operator to send file was displayed." << endl;
             
         }
 
@@ -666,6 +729,8 @@ void Problem::setUI(ofstream& log_file) {
         ofstream file("UI/data.json");
         file << shipData.dump(4); 
         file.close();
+
+        return log_sentence;
     }
     
 }
