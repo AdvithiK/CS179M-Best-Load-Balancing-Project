@@ -9,6 +9,7 @@ const internalrow_length = canvas.height/visiblerows;
 const visiblerow_length = canvas.height/visiblerows
 let firstEnter = true;
 let finalScreenShowing = false;
+let skipToEnd = false;
 
 function drawCrane() {
   const x = 0 * colWidth;   
@@ -166,6 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
           document.querySelector("#ready-screen h1:nth-child(2)").textContent = `${moves} move(s)`;
           document.querySelector("#ready-screen h1:nth-child(3)").textContent = `${minutes} minute(s)`;
+          let enter_message = "Hit ENTER when ready for first move";
+          if (parts[0] != 0) { 
+            document.querySelector("#ready-screen").append(enter_message);
+            skipToEnd = true;
+          }
           showReadyScreen(); 
 
         } else {

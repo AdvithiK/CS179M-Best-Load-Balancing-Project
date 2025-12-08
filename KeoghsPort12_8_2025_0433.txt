@@ -1,3 +1,0 @@
-12 8 2025: 04:33 Program was started.
-12 8 2025: 04:33 Manifest ShipCase4.txt is opened, there are 3 container(s) on the ship.
-12 8 2025: 04:33 Balance Solution found, it will require 5 moves/34 minutes.

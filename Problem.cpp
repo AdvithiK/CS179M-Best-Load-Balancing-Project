@@ -383,11 +383,15 @@ void Problem::moveCranetoOrigin(ShipNode &node){
 //search algorithm here
 void Problem::searchSolutionPath(){
     calculateShipNode(initial_ship_state);
+    balanceCheck(initial_ship_state);
+    ShipNode curr_node;
     cout << initial_ship_state.p_side_weight << " " << initial_ship_state.s_side_weight << endl;
     cout << endl;
     cout << "-------------------- SEARCH SOLUTION PATH FUNCTION --------------------" << endl;
-    ShipNode curr_node;
-    unexplored_ship_states.push(initial_ship_state);
+    if (!balCheck) {
+        unexplored_ship_states.push(initial_ship_state);
+    }
+    
     while(!unexplored_ship_states.empty() && !balCheck){
         
         curr_node = unexplored_ship_states.top();

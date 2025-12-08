@@ -1,47 +1,12 @@
 [
     {
-<<<<<<< HEAD
-        "name": " Pig\r",
+        "name": " Fish for Wendys\r",
         "x": 6,
         "y": 8
     },
     {
-        "name": " Owl  \r",
-        "x": 2,
-        "y": 8
-    },
-    {
-        "name": " Ewe\r",
-        "x": 3,
-        "y": 8
-    },
-    {
-        "name": " Eel\r",
-        "x": 4,
-        "y": 8
-    },
-    {
-        "name": " Cow\r",
+        "name": " Bikes\r",
         "x": 5,
-=======
-        "name": " Carpet\r",
-        "x": 1,
-        "y": 8
-    },
-    {
-        "name": " Tires  \r",
-        "x": 6,
-        "y": 7
-    },
-    {
-        "name": " Tools for JD\r",
-        "x": 6,
->>>>>>> b370686b757091f2a801425677418a8e0ab524d2
-        "y": 8
-    },
-    {
-        "name": " Cat\r",
-        "x": 10,
         "y": 8
     },
     {
