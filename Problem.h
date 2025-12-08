@@ -36,6 +36,7 @@ using namespace std;
 */
 
 struct Container{
+
     
     //stores the container's name
     string name;
@@ -180,7 +181,7 @@ struct ShipNode{
 
     //if we make parent a pointer, change it here (currently set to -> this, should it be nullptr?)
     //ShipNode(): default_ship_state(vector<vector<Container>>(8, vector<Container>(12))) {};
-    ShipNode(): default_ship_state(vector<vector<Container>>(9, vector<Container>(12))), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
+    ShipNode(): default_ship_state(vector<vector<Container>>(9, vector<Container>(12))), parent(nullptr), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
     ShipNode(const vector<vector<Container>>& given_ship_node) : default_ship_state(given_ship_node), parent(this), sum_weight(0), p_side_weight(0), s_side_weight(0), cost(0), heuristic(0) {};
 
 
@@ -195,10 +196,11 @@ class Problem
 public:
 
     Problem();
-    Problem(ShipNode& node): initial_ship_state(node) {};
+    Problem(ShipNode& node): initial_ship_state(node), solution_index(0) {};
 
     ShipNode initial_ship_state;
     ShipNode final_ship_state;
+    int solution_index;
 
     //stores a list of containers in the ship (pointers? im doing copies for time being)
     vector<Container> containers;
@@ -265,7 +267,7 @@ public:
     void balanceCheck(ShipNode& node);
 
 
-    void setUI(const ShipNode &node);
+    void setUI();
 
     void alterLog(ofstream&, string comment);
 

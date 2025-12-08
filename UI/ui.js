@@ -5,7 +5,7 @@ const rows = 8;
 const cols = 12;     
 const colWidth = canvas.width/cols;
 const rowLength = canvas.height/rows;
-let firstEnter = false;
+let firstEnter = true;
 
 
 function drawGrid() {
@@ -89,7 +89,17 @@ function drawContainers() {
 }
 
 
+
+function showManifestScreen() {
+    document.getElementById("enter-manifest-screen").style.display = "block";
+    document.getElementById("initial-screen").style.display = "none";
+    document.getElementById("ready-screen").style.display = "none";
+    document.getElementById("next-move-screen").style.display = "none";
+}
+
+
 function showInitialScreen() {
+    document.getElementById("enter-manifest-screen").style.display = "none";
     document.getElementById("initial-screen").style.display = "block";
     document.getElementById("ready-screen").style.display = "none";
     document.getElementById("next-move-screen").style.display = "none";
@@ -97,6 +107,7 @@ function showInitialScreen() {
 }
 
 function showReadyScreen() {
+    document.getElementById("enter-manifest-screen").style.display = "none";
     document.getElementById("initial-screen").style.display = "none";
     document.getElementById("ready-screen").style.display = "block";
     document.getElementById("next-move-screen").style.display = "none";
@@ -104,6 +115,7 @@ function showReadyScreen() {
 }
 
 function nextMoveScreen() {
+  document.getElementById("enter-manifest-screen").style.display = "none";
   document.getElementById("initial-screen").style.display = "none";
   document.getElementById("ready-screen").style.display = "none";
   document.getElementById("next-move-screen").style.display = "block";
@@ -111,15 +123,14 @@ function nextMoveScreen() {
   drawContainers();
 }
 
+
 async function updatetoReady() {
     try {
         const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
         const data = await res.json();
 
         // change this to showNextNodeScreen()
-        showReadyScreen();
-
-        // update top text
+        // showReadyScreen();
         
 
     } catch (err) {
@@ -142,18 +153,55 @@ async function updateData() {
     }
 }
 
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      if (!firstEnter) {
-        updatetoReady();
-        firstEnter = true;
-      } else {
-        nextMoveScreen();
-      }
-    }
+// document.addEventListener("keydown", (e) => {
+//     if (e.key === "Enter") {
+//       if (!firstEnter) {
+//           handleManifest(); 
+//           updateData();
+//           updatetoReady();
+//           firstEnter = true;
+//         } else {
+//             nextMoveScreen();
+//         }
+//     }
   
+// });
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Submit button
+    const btn = document.getElementById("submit-btn");
+
+    function handleManifest() {
+      const value = document.getElementById("text-box").value;
+      console.log("User typed:", value);
+
+      fetch("http://localhost:5051/run", {
+          method: "POST",
+          body: value
+      })
+      .then(res => res.text())
+      .then(text => console.log("Server responded:", text))
+      .catch(err => console.error("Fetch error:", err));
+    }
+
+    btn.addEventListener("click", handleManifest);
+
+    // Enter key handling
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            if (!firstEnter) {
+                handleManifest();
+                firstEnter = true;
+            } else {
+                nextMoveScreen();
+            }
+        }
+    });
+
+    showManifestScreen();
 });
 
 
-showInitialScreen();
+
+
 

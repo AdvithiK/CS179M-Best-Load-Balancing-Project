@@ -219,6 +219,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
 
         ShipNode new_node = node;
         new_node.parent = &node;
+        if (new_node.parent == nullptr) cout << "HUH\n\n" << endl;
 
         cout << "NEW COST BEFORE MOVING CONTAINER: " << new_node.cost << endl;
 
@@ -428,6 +429,7 @@ void Problem::searchSolutionPath(){
                     cout << "ran through container is moveable" << endl;
                     ShipNode crane_moved_node = curr_node;
                     crane_moved_node.parent = &curr_node;
+                    if (crane_moved_node.parent == nullptr) cout << "HUH\n\n" << endl;
                     moveCranetoContainer(crane_moved_node, containers.at(c));
                     unexplored_ship_states.push(crane_moved_node);
                 }
@@ -461,7 +463,8 @@ void Problem::traceSolutionPath(){
     while (the_parent != nullptr) {
         
         solution_path.push(the_parent);
-        the_parent = the_parent->parent;  
+        the_parent = the_parent->parent; 
+        cout << " OISDFIISJDFIOSDFJIOIODJSJIFJIFDS\n\n\n" << endl; 
     }
     
     cout << "solution_path.size(): " << solution_path.size() << endl;
@@ -504,4 +507,37 @@ void Problem::alterLog(ofstream& log_file, string comment) {
         << setw(2) << setfill('0') << local->tm_hour << ":"
         << setw(2) << setfill('0') << local->tm_min
         << comment << endl;
+}
+
+void Problem::setUI() {
+    // for each node in solution_path, reset the json file 
+    // enter should go to the next node in solution_path
+    // if you hit enter and the json file doesn't get updated ? then return finished solution 
+    // screen ?
+    
+    if (solution_path.size() > 0) {
+        ShipNode* curr_node = solution_path.top();
+        solution_path.pop();
+
+        json shipData;
+        for(int i = 0; i < containers.size(); i++){
+            shipData[i]["name"] = containers[i].weight;
+            shipData[i]["x"] = get_x_coord(*curr_node, containers.at(i));
+            shipData[i]["y"] = get_y_coord(*curr_node, containers.at(i))-1;
+            // add a bool to color the active box / crane red
+            // shipData[i]["active"] =
+        }
+
+        // add crane info 
+        Container crane = getCrane(*curr_node);
+        shipData[containers.size()]["name"] = crane.name;
+        shipData[containers.size()]["x"] = get_x_coord(*curr_node, crane);
+        shipData[containers.size()]["y"] = get_y_coord(*curr_node, crane)-1;
+        // shipData[containers.size()]["active"] =  
+
+        ofstream file("UI/data.json");
+        file << shipData.dump(4); 
+        file.close();
+    }
+    
 }

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib> 
 #include <thread>
+#include "httplib.h"
 
 
 #include "Problem.h"
@@ -26,9 +27,7 @@ using namespace std::chrono;
 //     return s.substr(start, end - start + 1);
 // }
 
-
-int main(){
-
+bool parseManifest(const string& name) {
     string log_file;
   
     time_t now = time(nullptr);
@@ -72,13 +71,10 @@ int main(){
     //take in the file (manifest)
 
     //variable for the inputting the file
-    string input_file;
+    string input_file = name;
 
     //take in file of coordinates as input (use locations.txt as example input file)
-    cout << "Enter the name of file: ";
-    cin >> input_file;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    // cin.ignore(numeric_limits<streamsize>::max(), '\n');
     //set the file name from commandline to file name variable
     //filename = input_file;
 
@@ -87,16 +83,7 @@ int main(){
 
     if(!file.is_open()){
         cout << "Errors occured when opening the file: \"" << input_file << endl;
-        
-        //second attempt to get correct file name
-        cout << "Enter the correct file name." << endl;
-        cin >> input_file;
-        file.open(input_file+".txt");
-
-        if(!file.is_open()){
-            cout << "Second attempt to open file failed. Exiting program." << endl;
-            return 1;
-        }
+        return 1;
     }
 
 
@@ -162,11 +149,10 @@ int main(){
 
 
     // start up the server & open it up
-    // system("python3 -m http.server 13000 &");
-    // system("open http://localhost:13000/UI/index.html");
+    // system("python3 -m http.server 5050 --directory UI &");
+    // system("open http://localhost:5050/index.html");
+
     // use this for checking if it does the auto update (can remove later)
-
-
 
     //turn the 2D vector object into a Ship Node, and start the algooo
     ShipNode initial_node(initial_ship_state);
@@ -184,12 +170,41 @@ int main(){
     }
 
     // run the algorithm
-    p.algo(initial_node, log, input_file+".txt");
-    out << p.final_ship_state; 
+    // p.algo(initial_node, log, input_file+".txt");
+    // out << p.final_ship_state; 
 
-    out.close();
-    log.close();
+    // out.close();
+    // log.close();
 
+}
+
+int main(){
+
+    // start up the server
+    // register the value that gets into the test file
+    // run the parsing
+    cout.sync_with_stdio(true);
+    httplib::Server server;
+
+
+    server.Post("/run", [](const httplib::Request& req, httplib::Response& res){
+        cout << "POST received with body: " << req.body << std::endl;
+        cout.flush();
+
+        bool success = parseManifest(req.body);
+
+        cout << "parseManifest returned: " << success << std::endl;
+        cout.flush();
+
+        res.set_content("OK", "text/plain");
+        res.set_header("Access-Control-Allow-Origin", "*");
+    });
+
+    cout << "Server running on http://localhost:5050\n";
+    server.listen("localhost", 5050);
+
+
+    
     
     return 0; 
 

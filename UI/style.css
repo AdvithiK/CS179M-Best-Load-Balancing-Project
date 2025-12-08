@@ -9,6 +9,28 @@ h1 {
   margin-left: 20px;
 }
 
+.manifest-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+  align-items: center;  
+  padding-top: 5vh;   
+  height: 100vh;
+  gap: 20px;  
+}
+
+#text-box {
+  width: 300px;
+  padding: 10px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+   
+}
+
+
+
 .program-container {
     display: flex;
     flex-direction: column;
