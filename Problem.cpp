@@ -497,11 +497,11 @@ void Problem::traceSolutionPath(){
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
     //print out the solution path
-    while (!solution_path.empty())
-    {
-        cout << solution_path.top() << endl;
-        solution_path.pop();
-    }
+    // while (!solution_path.empty())
+    // {
+    //     cout << solution_path.top() << endl;
+    //     solution_path.pop();
+    // }
 
 
 };

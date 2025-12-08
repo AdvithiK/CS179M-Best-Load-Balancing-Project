@@ -1,0 +1,103 @@
+[01,01], {00000}, NAN
+[01,02], {00560}, Steel Plates
+[01,03], {00490}, Cement Bags
+[01,04], {00610}, Engine Parts
+[01,05], {00380}, Metal Rods
+[01,06], {00420}, Iron Sheets
+[01,07], {00240}, Fabric Rolls
+[01,08], {00190}, Towels
+[01,09], {00210}, Paper Wrap
+[01,10], {00150}, Cups
+[01,11], {00270}, Clothing
+[01,12], {00000}, NAN
+
+[02,01], {00000}, UNUSED
+[02,02], {00600}, Machinery
+[02,03], {00510}, Tool Kits
+[02,04], {00460}, Rubber Rolls
+[02,05], {00620}, Heavy Coils
+[02,06], {00480}, Bulk Pipes
+[02,07], {00230}, Cartons
+[02,08], {00170}, Paper Rolls
+[02,09], {00190}, Resin
+[02,10], {00130}, Cotton Rolls
+[02,11], {00220}, Packaging Film
+[02,12], {00000}, UNUSED
+
+[03,01], {00000}, UNUSED
+[03,02], {00430}, Lumber
+[03,03], {00370}, Spare Parts
+[03,04], {00410}, Construction Goods
+[03,05], {00540}, Steel Rods
+[03,06], {00330}, Motor Supplies
+[03,07], {00000}, UNUSED
+[03,08], {00210}, Wrapping Paper
+[03,09], {00140}, Light Boxes
+[03,10], {00260}, Paper Towels
+[03,11], {00000}, UNUSED
+[03,12], {00000}, UNUSED
+
+[04,01], {00000}, UNUSED
+[04,02], {00320}, Plastic Cases
+[04,03], {00400}, Rubber Sheets
+[04,04], {00390}, Cleaning Supplies
+[04,05], {00350}, Spare Hardware
+[04,06], {00470}, Steel Tubing
+[04,07], {00000}, UNUSED
+[04,08], {00180}, Light Fabric
+[04,09], {00110}, Threads
+[04,10], {00160}, Foam Padding
+[04,11], {00000}, UNUSED
+[04,12], {00000}, UNUSED
+
+[05,01], {00000}, UNUSED
+[05,02], {00280}, Small Hardware
+[05,03], {00330}, Plastic Goods
+[05,04], {00290}, Rubber Goods
+[05,05], {00310}, Adhesives
+[05,06], {00270}, Light Tools
+[05,07], {00000}, UNUSED
+[05,08], {00140}, Thread Spools
+[05,09], {00090}, Envelopes
+[05,10], {00120}, Tissues
+[05,11], {00000}, UNUSED
+[05,12], {00000}, UNUSED
+
+[06,01], {00000}, UNUSED
+[06,02], {00250}, Paper Sheets
+[06,03], {00220}, Wrapping Film
+[06,04], {00240}, Packaging Foam
+[06,05], {00270}, Small Tools
+[06,06], {00210}, Plastic Wrap
+[06,07], {00000}, UNUSED
+[06,08], {00110}, Clips
+[06,09], {00070}, Small Boxes
+[06,10], {00080}, Tags
+[06,11], {00000}, UNUSED
+[06,12], {00000}, UNUSED
+
+[07,01], {00000}, UNUSED
+[07,02], {00000}, UNUSED
+[07,03], {00000}, UNUSED
+[07,04], {00000}, UNUSED
+[07,05], {00000}, UNUSED
+[07,06], {00000}, UNUSED
+[07,07], {00000}, UNUSED
+[07,08], {00000}, UNUSED
+[07,09], {00000}, UNUSED
+[07,10], {00000}, UNUSED
+[07,11], {00000}, UNUSED
+[07,12], {00000}, UNUSED
+
+[08,01], {00000}, UNUSED
+[08,02], {00000}, UNUSED
+[08,03], {00000}, UNUSED
+[08,04], {00000}, UNUSED
+[08,05], {00000}, UNUSED
+[08,06], {00000}, UNUSED
+[08,07], {00000}, UNUSED
+[08,08], {00000}, UNUSED
+[08,09], {00000}, UNUSED
+[08,10], {00000}, UNUSED
+[08,11], {00000}, UNUSED
+[08,12], {00000}, UNUSED
