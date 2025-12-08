@@ -36,6 +36,7 @@ using namespace std;
 */
 
 struct Container{
+
     
     //stores the container's name
     string name;
@@ -202,10 +203,11 @@ class Problem
 public:
 
     Problem();
-    Problem(ShipNode& node): initial_ship_state(node) {};
+    Problem(ShipNode& node): initial_ship_state(node), solution_index(0) {};
 
     ShipNode initial_ship_state;
     ShipNode final_ship_state;
+    int solution_index;
 
     //stores a list of containers in the ship (pointers? im doing copies for time being)
     vector<Container> containers;
@@ -273,7 +275,7 @@ public:
     void balanceCheck(ShipNode& node);
 
 
-    void setUI(const ShipNode &node);
+    void setUI();
 
     void alterLog(ofstream&, string comment);
 
