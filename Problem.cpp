@@ -459,36 +459,37 @@ void Problem::searchSolutionPath(){
 
 void Problem::traceSolutionPath(){
 
+
     ShipNode temp = final_ship_state; 
     temp.moving_container = final_ship_state.moving_container;
     solution_path.push(final_ship_state);
     solution_path_vec.push_back(final_ship_state);
-    //explore.back == final ship state
-    solution_path_vec.push_back(explored_ship_states.back());
-    //add the final state before crane is moved back
-    solution_path.push(explored_ship_states.back());
-    //set temp to the next node
-    //int i=0;
-    while (!(temp == initial_ship_state))
-    {
-        //cout << "node" << endl;
-        temp = explored_ship_states.at(temp.parent);
-        updatefinalSpots(temp);
-        solution_path.push(temp);
-        solution_path_vec.push_back(temp);
-        //i++;
-    }
+    if (!explored_ship_states.empty()) {
+        
+        solution_path_vec.push_back(explored_ship_states.back());
+        solution_path.push(explored_ship_states.back());
+        while (!(temp == initial_ship_state))
+        {
+            //cout << "node" << endl;
+            temp = explored_ship_states.at(temp.parent);
+            updatefinalSpots(temp);
+            solution_path.push(temp);
+            solution_path_vec.push_back(temp);
+            //i++;
+        }
 
-    if (final_ship_state.cost == 0) {
-        max_steps = 0;
-    } else {
-        max_steps = solution_path.size()-1;
-    }
+        if (final_ship_state.cost == 0) {
+            max_steps = 0;
+        } else {
+            max_steps = solution_path.size()-1;
+        }
 
-    reverse(solution_path_vec.begin(), solution_path_vec.end());
-    for(int i = 0; i < solution_path_vec.size(); i++){
-        cout << solution_path_vec.at(i).cost << endl;
+        reverse(solution_path_vec.begin(), solution_path_vec.end());
+        for(int i = 0; i < solution_path_vec.size(); i++){
+            cout << solution_path_vec.at(i).cost << endl;
+        }
     }
+   
 
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
@@ -521,6 +522,8 @@ string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
     //loads the solution path stack with the trace to final solution
     traceSolutionPath();
     int total_cost = final_ship_state.cost;
+
+    if (max_steps == 1) max_steps = 0;
 
     log_file << (local->tm_mon + 1) << " "
         << local->tm_mday << " "

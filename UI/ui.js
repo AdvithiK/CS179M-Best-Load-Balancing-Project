@@ -93,9 +93,7 @@ function drawContainers() {
 
       });
 
-    
 }
-
 
 
 function showManifestScreen() {
