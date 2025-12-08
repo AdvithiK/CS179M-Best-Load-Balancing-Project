@@ -576,8 +576,6 @@ void Problem::setUI(ofstream& log_file) {
     tm *local = localtime(&now);
     
     if (solution_path.size() > 0) {
-        int max_steps = solution_path.size();
-
         ShipNode curr_node = solution_path.top();
         solution_path.pop();
 
