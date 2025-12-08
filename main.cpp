@@ -171,7 +171,7 @@ bool parseManifest(const string& name) {
 
     // run the algorithm
     p.algo(initial_node, log, input_file+".txt");
-    p.outputStepsToJSON(input_file + "STEPS.json");
+    //p.outputStepsToJSON(input_file + "STEPS.json");
     out << p.final_ship_state; 
 
     // out.close();
