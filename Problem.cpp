@@ -548,7 +548,7 @@ void Problem::alterLog(ofstream& log_file, string comment) {
         << (local->tm_year + 1900) << ": "
         << setw(2) << setfill('0') << local->tm_hour << ":"
         << setw(2) << setfill('0') << local->tm_min
-        << comment << endl;
+        << " " << comment << endl;
 
     
 }

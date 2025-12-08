@@ -145,6 +145,27 @@ function showFinalScreen() {
 document.addEventListener("DOMContentLoaded", () => {
 
     const btn = document.getElementById("submit-btn");
+    const log_btn = document.getElementById("log-btn");
+
+  
+
+    function handleComment() {
+      const comment = document.getElementById("comment-box").value;
+      console.log(comment);
+
+      fetch("http://localhost:8080/input", {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: comment
+      })
+      .then(res => res.text())
+      .then(text => { 
+        console.log(text)
+        document.getElementById("comment-box").value = "";
+      })
+      .catch(err => console.error("Fetch error:", err));
+      
+    }
 
     function handleManifest() {
       const value = document.getElementById("text-box").value;
@@ -181,6 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     btn.addEventListener("click", handleManifest);
+    log_btn.addEventListener("click", handleComment);
 
     
     document.addEventListener("keydown", (e) => {

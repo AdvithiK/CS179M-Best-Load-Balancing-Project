@@ -170,6 +170,15 @@ int main(){
         res.set_header("Access-Control-Allow-Origin", "*");
     });
 
+     server.Post("/input", [&p, &log](const httplib::Request& req, httplib::Response& res){
+        if (req.body != "") {
+            p.alterLog(log, req.body);
+            res.set_content("OK", "text/plain");
+            res.set_header("Access-Control-Allow-Origin", "*");
+        }
+ 
+    });
+
     server.Post("/nextmove", [&p, &log](const httplib::Request& req, httplib::Response& res){
 
         string sentence = p.setUI(log); 
