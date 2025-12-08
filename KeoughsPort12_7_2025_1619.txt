@@ -1,2 +1,0 @@
-12 7 2025: 16:19 Program was started.
-12 7 2025: 16:19 Manifest Test3.txt is opened, there are 8 container(s) on the ship.

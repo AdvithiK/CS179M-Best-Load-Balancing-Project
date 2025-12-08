@@ -129,6 +129,8 @@ struct ShipNode{
     //measured via distance from minimum viable balancing different
     int heuristic;
 
+    Container moving_container = Container();
+
     //overload operators for ShipNode 
 
     //less than operator for the priority queue to measure priority
@@ -209,6 +211,8 @@ public:
     ShipNode final_ship_state;
     int solution_index;
 
+    int max_steps = 1;
+
     //stores a list of containers in the ship (pointers? im doing copies for time being)
     vector<Container> containers;
 
@@ -275,13 +279,15 @@ public:
     void balanceCheck(ShipNode& node);
 
 
-    void setUI();
+    void setUI(ofstream& log_file);
 
     void alterLog(ofstream&, string comment);
 
     vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);
 
-    void outputStepsToJSON(const string& filename);
+    void reportCommenttoLog(ofstream& log_file, string comment);
+
+    //void outputStepsToJSON(const string& filename);
 
 
 

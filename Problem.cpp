@@ -221,6 +221,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         //new_node.parent = &node;
         //new_node.parent = &explored_ship_states.back();
         new_node.parent = explored_ship_states.size()-1;
+        new_node.moving_container = box;
 
         cout << "NEW COST BEFORE MOVING CONTAINER: " << new_node.cost << endl;
 
@@ -493,7 +494,7 @@ void Problem::traceSolutionPath(){
     }
     //solution_path.push(explored_ship_states.back());
     //cout << "why" << endl;
-
+    max_steps = solution_path.size();
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
     //print out the solution path
@@ -525,8 +526,18 @@ void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
         << containers.size() << " container(s) on the ship." << endl;
 
     searchSolutionPath();
-    //traceSolutionPath();
-   
+    //loads the solution path stack with the trace to final solution
+    traceSolutionPath();
+    int max_steps = solution_path.size();
+    int total_cost = final_ship_state.cost;
+
+    log_file << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << " Balance Solution found, it will require " << max_steps 
+        << " moves/" << total_cost << " minutes." << endl;
 
 }
 
@@ -542,16 +553,33 @@ void Problem::alterLog(ofstream& log_file, string comment) {
         << comment << endl;
 }
 
-void Problem::setUI() {
+void Problem::reportCommenttoLog(ofstream& log_file, string comment){
+    time_t now = time(0);
+    tm *local = localtime(&now);
+
+    log_file << (local->tm_mon + 1) << " "
+        << local->tm_mday << " "
+        << (local->tm_year + 1900) << ": "
+        << setw(2) << setfill('0') << local->tm_hour << ":"
+        << setw(2) << setfill('0') << local->tm_min
+        << "A comment was written to the log \"" << comment << "\""<< endl;
+}
+
+void Problem::setUI(ofstream& log_file) {
     // for each node in solution_path, reset the json file 
     // enter should go to the next node in solution_path
     // if you hit enter and the json file doesn't get updated ? then return finished solution 
     // screen ?
+
+    //set time stamp for log file
+    time_t now = time(0);
+    tm *local = localtime(&now);
     
     if (solution_path.size() > 0) {
         ShipNode curr_node = solution_path.top();
         solution_path.pop();
 
+        //formatting the info for 
         json shipData;
         for(int i = 0; i < containers.size(); i++){
             shipData[i]["name"] = containers[i].weight;
@@ -567,6 +595,69 @@ void Problem::setUI() {
         shipData[containers.size()]["x"] = get_x_coord(curr_node, crane);
         shipData[containers.size()]["y"] = get_y_coord(curr_node, crane)-1;
         // shipData[containers.size()]["active"] =  
+        //store which step we are at based on solution_path size
+        int step = max_steps - solution_path.size();
+        //if this is the first log file statement, print move crane to container
+        if (step == 1){
+            log_file << (local->tm_mon + 1) << " "
+                << local->tm_mday << " "
+                << (local->tm_year + 1900) << ": "
+                << setw(2) << setfill('0') << local->tm_hour << ":"
+                << setw(2) << setfill('0') << local->tm_min
+                << " " << step << " out of " << max_steps << ": Move from PARK to [" 
+                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
+                get_x_coord(curr_node, curr_node.moving_container) << "], " << 
+                curr_node.cost << " minutes." << endl;
+        }
+        else if(step < max_steps){
+            //otherwise, default step print:
+            //grab the next value and store it
+            solution_path.pop();
+            ShipNode next_node_temp = solution_path.top();
+            //restore curr node after grabbing next value
+            solution_path.push(curr_node);
+
+            log_file << (local->tm_mon + 1) << " "
+                << local->tm_mday << " "
+                << (local->tm_year + 1900) << ": "
+                << setw(2) << setfill('0') << local->tm_hour << ":"
+                << setw(2) << setfill('0') << local->tm_min
+                << " " << step << " out of " << max_steps << ": Move container in [" 
+                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
+                get_x_coord(curr_node, curr_node.moving_container) << "] to [" << 
+                get_y_coord(next_node_temp, curr_node.moving_container) << ", " << 
+                get_x_coord(next_node_temp, curr_node.moving_container) << "], "<<
+                curr_node.cost << " minutes." << endl;
+        }
+        else if (step == max_steps){
+            //if we are at the final ship state
+            log_file << (local->tm_mon + 1) << " "
+                << local->tm_mday << " "
+                << (local->tm_year + 1900) << ": "
+                << setw(2) << setfill('0') << local->tm_hour << ":"
+                << setw(2) << setfill('0') << local->tm_min
+                << " " << step << " out of " << max_steps << ": Move from [" 
+                << get_y_coord(curr_node, curr_node.moving_container) << ", " << 
+                get_x_coord(curr_node, curr_node.moving_container) << "] to PARK, " << 
+                curr_node.cost << " minutes." << endl;
+        }
+        else{
+            //final ship state solution is displayed, return the final manifest
+            log_file << (local->tm_mon + 1) << " "
+                << local->tm_mday << " "
+                << (local->tm_year + 1900) << ": "
+                << setw(2) << setfill('0') << local->tm_hour << ":"
+                << setw(2) << setfill('0') << local->tm_min
+                << "Finished a Cycle. Manifest" << "GRAB MANIFEST NAME" << 
+                "was written to desktop, and a reminder pop-up to operator to send file was displayed." << endl;
+            
+        }
+
+
+        //otherwise, default step
+ 
+
+        //last log file statement is move crane to [0,0]
 
         ofstream file("UI/data.json");
         file << shipData.dump(4); 
@@ -575,70 +666,37 @@ void Problem::setUI() {
     
 }
 
-void Problem::setUI() {
-    // for each node in solution_path, reset the json file 
-    // enter should go to the next node in solution_path
-    // if you hit enter and the json file doesn't get updated ? then return finished solution 
-    // screen ?
+// void Problem::outputStepsToJSON(const string& filename) {
+//     json steps_json = json::array();
     
-    if (solution_path.size() > 0) {
-        ShipNode curr_node = solution_path.top();
-        solution_path.pop();
-
-        json shipData;
-        for(int i = 0; i < containers.size(); i++){
-            shipData[i]["name"] = containers[i].weight;
-            shipData[i]["x"] = get_x_coord(curr_node, containers.at(i));
-            shipData[i]["y"] = get_y_coord(curr_node, containers.at(i))-1;
-            // add a bool to color the active box / crane red
-            // shipData[i]["active"] =
-        }
-
-        // add crane info 
-        Container crane = getCrane(curr_node);
-        shipData[containers.size()]["name"] = crane.name;
-        shipData[containers.size()]["x"] = get_x_coord(curr_node, crane);
-        shipData[containers.size()]["y"] = get_y_coord(curr_node, crane)-1;
-        // shipData[containers.size()]["active"] =  
-
-        ofstream file("UI/data.json");
-        file << shipData.dump(4); 
-        file.close();
-    }
+//     stack<ShipNode> temp_path = solution_path;
+//     int step_num = 0;
     
-}
-
-void Problem::outputStepsToJSON(const string& filename) {
-    json steps_json = json::array();
-    
-    stack<ShipNode> temp_path = solution_path;
-    int step_num = 0;
-    
-    while (!temp_path.empty()) {
-        ShipNode node = temp_path.top();
-        temp_path.pop();
+//     while (!temp_path.empty()) {
+//         ShipNode node = temp_path.top();
+//         temp_path.pop();
         
-        json step;
-        step["step_number"] = step_num++;
-        step["cost"] = node.cost;
+//         json step;
+//         step["step_number"] = step_num++;
+//         step["cost"] = node.cost;
         
-        json grid = json::array();
-        for (int i = 8; i >= 0; i--) {
-            json row = json::array();
-            for (int j = 0; j < 12; j++) {
-                json cell;
-                cell["name"] = node.default_ship_state[i][j].name;
-                cell["weight"] = node.default_ship_state[i][j].weight;
-                row.push_back(cell);
-            }
-            grid.push_back(row);
-        }
-        step["grid"] = grid;
+//         json grid = json::array();
+//         for (int i = 8; i >= 0; i--) {
+//             json row = json::array();
+//             for (int j = 0; j < 12; j++) {
+//                 json cell;
+//                 cell["name"] = node.default_ship_state[i][j].name;
+//                 cell["weight"] = node.default_ship_state[i][j].weight;
+//                 row.push_back(cell);
+//             }
+//             grid.push_back(row);
+//         }
+//         step["grid"] = grid;
         
-        steps_json.push_back(step);
-    }
+//         steps_json.push_back(step);
+//     }
     
-    ofstream out(filename);
-    out << steps_json.dump(4);
-    out.close();
-}
+//     ofstream out(filename);
+//     out << steps_json.dump(4);
+//     out.close();
+// }
