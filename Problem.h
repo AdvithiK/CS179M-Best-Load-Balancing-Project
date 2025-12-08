@@ -279,6 +279,8 @@ public:
 
     vector<pair<int,int>> find_dest_list(const ShipNode& node, Container& box);
 
+    void outputStepsToJSON(const string& filename);
+
 
 
 };

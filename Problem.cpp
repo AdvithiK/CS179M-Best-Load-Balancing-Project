@@ -525,7 +525,7 @@ void Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
         << containers.size() << " container(s) on the ship." << endl;
 
     searchSolutionPath();
-    traceSolutionPath();
+    //traceSolutionPath();
    
 
 }
@@ -540,4 +540,39 @@ void Problem::alterLog(ofstream& log_file, string comment) {
         << setw(2) << setfill('0') << local->tm_hour << ":"
         << setw(2) << setfill('0') << local->tm_min
         << comment << endl;
+}
+
+void Problem::outputStepsToJSON(const string& filename) {
+    json steps_json = json::array();
+    
+    stack<ShipNode> temp_path = solution_path;
+    int step_num = 0;
+    
+    while (!temp_path.empty()) {
+        ShipNode node = temp_path.top();
+        temp_path.pop();
+        
+        json step;
+        step["step_number"] = step_num++;
+        step["cost"] = node.cost;
+        
+        json grid = json::array();
+        for (int i = 8; i >= 0; i--) {
+            json row = json::array();
+            for (int j = 0; j < 12; j++) {
+                json cell;
+                cell["name"] = node.default_ship_state[i][j].name;
+                cell["weight"] = node.default_ship_state[i][j].weight;
+                row.push_back(cell);
+            }
+            grid.push_back(row);
+        }
+        step["grid"] = grid;
+        
+        steps_json.push_back(step);
+    }
+    
+    ofstream out(filename);
+    out << steps_json.dump(4);
+    out.close();
 }
