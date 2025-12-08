@@ -29,22 +29,30 @@ h1 {
    
 }
 
+#next-move-screen {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 25px;
+  letter-spacing: 1px;
+  margin-left: 20px;
+  max-height: 25vh;      
+  overflow-y: auto;       
+    
+  margin-top: 20px; 
+}
+
+#next-move-screen p{
+  font-family: "Courier New", Courier, monospace;
+  font-size: 25px;
+  letter-spacing: 1px;
+  margin-left: 20px;
+}
+
 
 
 .program-container {
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;     
-    height: 100vh;
-    gap: 5px;
-    position: fixed;
-    bottom: 20px; */
-
     display: flex;
     flex-direction: column;
     gap: 5px;
-
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -52,8 +60,6 @@ h1 {
 }
 
 #ShipBox {
-
-    border: 2px solid black;
-   
+  border: 2px solid black;
 }
 
