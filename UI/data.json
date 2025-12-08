@@ -1,12 +1,17 @@
 [
     {
-        "name": " Fish for Wendys\r",
-        "x": 6,
+        "name": " Carpet\r",
+        "x": 1,
         "y": 8
     },
     {
-        "name": " Bikes\r",
-        "x": 5,
+        "name": " Tires  \r",
+        "x": 6,
+        "y": 7
+    },
+    {
+        "name": " Tools for JD\r",
+        "x": 6,
         "y": 8
     },
     {
@@ -21,7 +26,7 @@
     },
     {
         "name": "CRANE",
-        "x": 6,
-        "y": 7
+        "x": 0,
+        "y": 0
     }
 ]

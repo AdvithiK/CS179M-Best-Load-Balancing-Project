@@ -67,10 +67,6 @@ void Problem::findContainers(const ShipNode& node){
     for (int i = node.default_ship_state.size() - 1; i >= 0; i--) { 
         for (int j = 0; j < node.default_ship_state[i].size(); j++) { 
             string name = trim(node.default_ship_state[i][j].name);
-            // if (node.default_ship_state[i][j].name != "UNUSED" && node.default_ship_state[i][j].name != "NAN" ){
-            //     Container temp_container = node.default_ship_state[i][j];
-            //     containers.push_back(temp_container);
-            // }
             if (name != "UNUSED" && name != "NAN" && name != "CRANE"){
                 Container temp_container = node.default_ship_state[i][j];
                 containers.push_back(temp_container);
@@ -94,22 +90,7 @@ void Problem::findNAN(const ShipNode& node){
 
 };
 
-// void Problem::updateContainers(const ShipNode& node){
-//     for(Container &box : containers){ 
-//         for(int i = node.default_ship_state.size()-1; i >= 0; i--){
-//             for(int j = 0; j < node.default_ship_state[i].size(); j++){
 
-//                 if(trim(node.default_ship_state[i][j].name) == trim(box.name)){
-//                     //recomputing final_y and final_x
-//                     box.final_y = node.default_ship_state.size() - i;
-//                     box.final_x = j + 1;
-//                     goto next_container;
-//                 }
-//             }
-//         }
-//         next_container:;
-//     }
-// }
 
 void Problem::updatefinalSpots(ShipNode& node){
 
@@ -128,17 +109,14 @@ void Problem::updatefinalSpots(ShipNode& node){
 void Problem::printContainersList(ShipNode& node){
     cout << "---------- Containers Printing ----------" << endl;
     for(int i = 0; i < containers.size(); i++){
-        //testing for spacing
-        //cout << "*" << containers.at(i).name << "\n";
-        //int index_coord_y = (node.default_ship_state.size() - containers.at(i).final_y );
-        //int index_coord_x = containers.at(i).final_x-1;
+    
         cout << endl;
         int index_coord_y = get_y_coord(node, containers.at(i));
         int index_coord_x = get_x_coord(node, containers.at(i));
         cout << containers.at(i) << endl;
         cout << "index: (" << index_coord_y << ", " << index_coord_x << ")" << endl;
     }
-    //cout << containers.size();
+   
 }
 
 
@@ -229,7 +207,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         cout << "Index_y: " << index_y << endl;
         cout << "Index_x: " << index_x << endl;
 
-        // if (index_x == 8) break;
+
 
         int container_y = get_y_coord(node, box);
         int container_x = get_x_coord(node, box);
@@ -238,8 +216,7 @@ void Problem::exploreShipNodes(ShipNode& node, Container& box){
         cout << "container_x: " << container_x << endl;
 
         ShipNode new_node = node;
-        //new_node.parent = &node;
-        //new_node.parent = &explored_ship_states.back();
+
         new_node.parent = explored_ship_states.size()-1;
         new_node.moving_container = box;
 
@@ -489,8 +466,7 @@ void Problem::traceSolutionPath(){
         solution_path.push(temp);
         //i++;
     }
-    //solution_path.push(explored_ship_states.back());
-    //cout << "why" << endl;
+
     if (final_ship_state.cost == 0) {
         max_steps = 0;
     } else {
@@ -499,12 +475,7 @@ void Problem::traceSolutionPath(){
 
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
-    //print out the solution path
-    // while (!solution_path.empty())
-    // {
-    //     cout << solution_path.top() << endl;
-    //     solution_path.pop();
-    // }
+
 
 
 };
@@ -532,7 +503,6 @@ string Problem::algo(ShipNode& node, ofstream& log_file, string filename) {
     searchSolutionPath();
     //loads the solution path stack with the trace to final solution
     traceSolutionPath();
-    // int max_steps = solution_path.size();
     int total_cost = final_ship_state.cost;
 
     log_file << (local->tm_mon + 1) << " "
@@ -559,6 +529,8 @@ void Problem::alterLog(ofstream& log_file, string comment) {
         << setw(2) << setfill('0') << local->tm_hour << ":"
         << setw(2) << setfill('0') << local->tm_min
         << comment << endl;
+
+    
 }
 
 void Problem::reportCommenttoLog(ofstream& log_file, string comment){
@@ -571,6 +543,8 @@ void Problem::reportCommenttoLog(ofstream& log_file, string comment){
         << setw(2) << setfill('0') << local->tm_hour << ":"
         << setw(2) << setfill('0') << local->tm_min
         << "A comment was written to the log \"" << comment << "\""<< endl;
+
+   
 }
 
 void Problem::setInitialNode() {
@@ -708,31 +682,19 @@ string Problem::setUI(ofstream& log_file) {
 
             
         }
-        else{
-            //final ship state solution is displayed, return the final manifest
-            // log_file << (local->tm_mon + 1) << " "
-            //     << local->tm_mday << " "
-            //     << (local->tm_year + 1900) << ": "
-            //     << setw(2) << setfill('0') << local->tm_hour << ":"
-            //     << setw(2) << setfill('0') << local->tm_min
-            //     << "Finished a Cycle. Manifest" << "GRAB MANIFEST NAME" << 
-            //     "was written to desktop, and a reminder pop-up to operator to send file was displayed." << endl;
-            
-        }
-
-
-        //otherwise, default step
- 
-
-        //last log file statement is move crane to [0,0]
 
         ofstream file("UI/data.json");
         file << shipData.dump(4); 
         file.close();
 
-        return log_sentence;
+        
+    } else {
+        
+        log_sentence = "DONE";
     }
-    
+
+    return log_sentence;
+
 }
 
 

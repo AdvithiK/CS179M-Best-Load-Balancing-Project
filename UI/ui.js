@@ -8,17 +8,17 @@ const colWidth = canvas.width/cols;
 const internalrow_length = canvas.height/visiblerows;
 const visiblerow_length = canvas.height/visiblerows
 let firstEnter = true;
+let finalScreenShowing = false;
 
 function drawCrane() {
-  const x = 0 * colWidth;   // left side
-  const y = 9 * internalrow_length;  // above the top of the visible grid
+  const x = 0 * colWidth;   
+  const y = 9 * internalrow_length;  
 
   ctx.fillStyle = "red";
   ctx.globalAlpha = 0.7;
   ctx.fillRect(x, y, colWidth, internalrow_length);
   ctx.globalAlpha = 1.0;
 }
-
 
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -41,7 +41,7 @@ function drawGrid() {
 
 
 function drawContainers() {
-  ctx.clearReact;
+  ctx.clearRect;
   const colors = [
   "#FFD700", 
   "#FFA500", 
@@ -80,7 +80,6 @@ function drawContainers() {
               ctx.fillStyle = colors[colorIndex];
               colorIndex++;
             }
-            
 
             ctx.fillRect(px, py, colWidth, visiblerow_length);
             ctx.strokeRect(px, py, colWidth, visiblerow_length);
@@ -93,7 +92,7 @@ function drawContainers() {
 
       });
 
-    // drawCrane();
+    
 }
 
 
@@ -132,40 +131,16 @@ function nextMoveScreen() {
   drawContainers();
 }
 
-
-
-
-
-
-async function updatetoReady() {
-    try {
-        const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
-        const data = await res.json();
-
-        // change this to showNextNodeScreen()
-        // showReadyScreen();
-        
-
-    } catch (err) {
-        console.log("Still loading...");
-        showInitialScreen();
-    }
+function showFinalScreen() {
+  document.getElementById("final-screen").style.display = "block";
+  document.getElementById("enter-manifest-screen").style.display = "none";
+  document.getElementById("initial-screen").style.display = "none";
+  document.getElementById("ready-screen").style.display = "none";
+  document.getElementById("next-move-screen").style.display = "none";
+  drawGrid();
+  drawContainers();
+  finalScreenShowing = true;
 }
-
-async function updateData() {
-    try {
-        const res = await fetch("data.json?t=" + Date.now()); // check for updated json file
-        const data = await res.json();
-
-        showReadyScreen();
-        
-
-    } catch (err) {
-        console.log("Still loading...");
-        showInitialScreen();
-    }
-}
-
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -203,28 +178,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.addEventListener("click", handleManifest);
 
-    // Enter key handling
     
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !finalScreenShowing) {
             fetch("http://localhost:8080/nextmove", { method: "POST" })
               .then(res => res.text())       
               .then(text => {
-                  if (text === "DONE") {
-                      console.log("No more moves");
-                        
-                  } else {
-                    const logContainer = document.querySelector("#next-move-screen");
-                    const p = document.createElement("p");
-                    p.textContent = text;
-                    logContainer.appendChild(p);
+                const finalScreen = document.getElementById("final-screen");
+                const nextScreen = document.getElementById("next-move-screen");
+                const cleanText = text.trim();
 
-                    // redraw canvas with updated JSON
-                    
+                if (cleanText.includes("OUTBOUND")) {
+                   
+                    nextScreen.textContent = "";
+                    finalScreen.textContent = "I have written an updated manifest to the desktop as "+ cleanText +". Don't forget to email it to the captain. Hit ENTER when done";
+              
+                    showFinalScreen(); 
+                } else {
+  
+                    const p = document.createElement("p");
+                    p.textContent = cleanText;
+                    nextScreen.appendChild(p);
                     nextMoveScreen();
-                  }
+                }
               })
               .catch(err => console.error("Next move fetch error:", err));
+        } else if (e.key === "Enter") {
+          fetch("http://localhost:8080/exit", { method: "POST" })
+            .then(res => res.text())
+            .then(text => console.log("Server response:", text))
+            .catch(err => console.error("Exit fetch error:", err));
         }
     });
 
