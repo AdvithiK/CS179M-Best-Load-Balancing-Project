@@ -497,11 +497,11 @@ void Problem::traceSolutionPath(){
     cout << "solution_path.size(): " << solution_path.size() << endl;
 
     //print out the solution path
-    while (!solution_path.empty())
-    {
-        cout << solution_path.top() << endl;
-        solution_path.pop();
-    }
+    // while (!solution_path.empty())
+    // {
+    //     cout << solution_path.top() << endl;
+    //     solution_path.pop();
+    // }
 
 
 };
@@ -549,23 +549,23 @@ void Problem::setUI() {
     // screen ?
     
     if (solution_path.size() > 0) {
-        ShipNode* curr_node = solution_path.top();
+        ShipNode curr_node = solution_path.top();
         solution_path.pop();
 
         json shipData;
         for(int i = 0; i < containers.size(); i++){
             shipData[i]["name"] = containers[i].weight;
-            shipData[i]["x"] = get_x_coord(*curr_node, containers.at(i));
-            shipData[i]["y"] = get_y_coord(*curr_node, containers.at(i))-1;
+            shipData[i]["x"] = get_x_coord(curr_node, containers.at(i));
+            shipData[i]["y"] = get_y_coord(curr_node, containers.at(i))-1;
             // add a bool to color the active box / crane red
             // shipData[i]["active"] =
         }
 
         // add crane info 
-        Container crane = getCrane(*curr_node);
+        Container crane = getCrane(curr_node);
         shipData[containers.size()]["name"] = crane.name;
-        shipData[containers.size()]["x"] = get_x_coord(*curr_node, crane);
-        shipData[containers.size()]["y"] = get_y_coord(*curr_node, crane)-1;
+        shipData[containers.size()]["x"] = get_x_coord(curr_node, crane);
+        shipData[containers.size()]["y"] = get_y_coord(curr_node, crane)-1;
         // shipData[containers.size()]["active"] =  
 
         ofstream file("UI/data.json");
@@ -582,23 +582,23 @@ void Problem::setUI() {
     // screen ?
     
     if (solution_path.size() > 0) {
-        ShipNode* curr_node = solution_path.top();
+        ShipNode curr_node = solution_path.top();
         solution_path.pop();
 
         json shipData;
         for(int i = 0; i < containers.size(); i++){
             shipData[i]["name"] = containers[i].weight;
-            shipData[i]["x"] = get_x_coord(*curr_node, containers.at(i));
-            shipData[i]["y"] = get_y_coord(*curr_node, containers.at(i))-1;
+            shipData[i]["x"] = get_x_coord(curr_node, containers.at(i));
+            shipData[i]["y"] = get_y_coord(curr_node, containers.at(i))-1;
             // add a bool to color the active box / crane red
             // shipData[i]["active"] =
         }
 
         // add crane info 
-        Container crane = getCrane(*curr_node);
+        Container crane = getCrane(curr_node);
         shipData[containers.size()]["name"] = crane.name;
-        shipData[containers.size()]["x"] = get_x_coord(*curr_node, crane);
-        shipData[containers.size()]["y"] = get_y_coord(*curr_node, crane)-1;
+        shipData[containers.size()]["x"] = get_x_coord(curr_node, crane);
+        shipData[containers.size()]["y"] = get_y_coord(curr_node, crane)-1;
         // shipData[containers.size()]["active"] =  
 
         ofstream file("UI/data.json");
